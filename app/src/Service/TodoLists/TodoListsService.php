@@ -19,4 +19,11 @@ interface TodoListsService
      * @return TodoList
      */
     public function createTodoList(Request $request): TodoList;
+
+    /**
+     * Holt eine einzelne Liste aus der Datenbank ab.
+     * @param int $id  Die Id der Liste
+     * @return TodoList Die gefundene Liste.
+     */
+    public function getSingleTodoList(int $id): TodoList;
 }
