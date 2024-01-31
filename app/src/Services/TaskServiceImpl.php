@@ -45,7 +45,9 @@ class TaskServiceImpl implements TaskService
         $task->setDescription($object['description']);
         $task->setPriority($object['priority']);
         $task->setIsDeleted($object['deleted']);
-        $task->setDateOfExpiry(new DateTime($object['dateOfExpiry']));
+        if(isset($object['dateOfExpiry'])){
+            $task->setDateOfExpiry(new DateTime($object['dateOfExpiry']));
+        }
         $task->setList($exisitngList);
         $task->setIsDone($object['done']);
 

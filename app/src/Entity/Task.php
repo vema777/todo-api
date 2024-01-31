@@ -23,7 +23,7 @@ class Task implements JsonSerializable
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTime $dateOfExpiry = null;
 
     #[ORM\Column]
