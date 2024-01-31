@@ -35,10 +35,10 @@ class Task implements JsonSerializable
     private int $priority = 3;
 
     #[ORM\Column(nullable: false)]
-    private ?bool $isDeleted = false;
+    private bool $isDeleted = false;
 
     #[ORM\Column]
-    private ?bool $isDone = false;
+    private bool $isDone = false;
 
     public function __construct()
     {
