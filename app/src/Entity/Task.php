@@ -27,7 +27,10 @@ class Task
     private ?int $priority = null;
 
     #[ORM\Column]
-    private ?bool $deleted = null;
+    private ?bool $deleted = false;
+
+    #[ORM\Column]
+    private ?bool $done = null;
 
     /**
      * @return int|null
@@ -143,8 +146,19 @@ class Task
             'description' => $this->description,
             'dateOfexpiry' => $this->dateOfExpiry,
             'priority' => $this->priority,
-            'deleted' => $this->deleted
+            'deleted' => $this->deleted,
+            'done' => $this->done
         ];
 
+    }
+
+    public function getDone(): ?bool
+    {
+        return $this->done;
+    }
+
+    public function setDone(?bool $done): void
+    {
+        $this->done = $done;
     }
 }

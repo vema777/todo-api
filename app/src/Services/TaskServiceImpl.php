@@ -39,6 +39,7 @@ class TaskServiceImpl implements TaskService
         $task->setPriority($object['3']);
         $task->setDeleted($object['false']);
         $task->setDateOfExpiry($object['dateOfExpiry']);
+        $task->setDone($object['false']);
         $this->entityManager->persist($task);
         $this->entityManager->flush();
         return $task;
