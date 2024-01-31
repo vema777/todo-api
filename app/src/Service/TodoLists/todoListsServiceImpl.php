@@ -21,11 +21,17 @@ readonly class todoListsServiceImpl implements TodoListsService
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getAllLists(): array
     {
         return $this->todoListRepository->findAll();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function createTodoList(Request $request): TodoList
     {
         $object = json_decode($request->getContent(), true);

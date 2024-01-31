@@ -1,0 +1,9 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Complete
+            description: Complete ist eine Anwendung mit der sich Aufgaben verwalten lassen. Dabei wird es auch möglich sein Organisationen zu erstellen, und Aufgaben an Mitglieder einer Organisation zuzuweisen!
+            version: 1.0.0
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc

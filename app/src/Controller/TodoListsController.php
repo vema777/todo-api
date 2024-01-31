@@ -7,8 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Annotations as OA;
 
-#[Route(path: '/api/lists')]
+#[Route(path: '/api/lists', name: "Listen")]
 class TodoListsController extends AbstractController
 {
     private readonly TodoListsService $todoListsService;
@@ -21,8 +22,8 @@ class TodoListsController extends AbstractController
     #[Route(path: '', methods: ['GET'])]
     public function getAllLists(): JsonResponse
     {
-        $todoLists = $this->todoListsService->getAllLists();
-        return $this->json($todoLists);
+        $todoListsArr = $this->todoListsService->getAllLists();
+        return $this->json($todoListsArr);
     }
 
     #[Route(path: '',methods: ['POST'])]
