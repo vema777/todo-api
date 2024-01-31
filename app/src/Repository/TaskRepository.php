@@ -21,11 +21,6 @@ class TaskRepository extends ServiceEntityRepository
         parent::__construct($registry, Task::class);
     }
 
-    public function getAllTasks(): array
-    {
-        return $this->findBy(['deleted' => false], ['taskId' => 'ASC'] );
-
-    }
 
 //    /**
 //     * @return Task[] Returns an array of Task objects

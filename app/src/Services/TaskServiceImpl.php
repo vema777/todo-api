@@ -25,6 +25,11 @@ class TaskServiceImpl implements TaskService
 
     }
 
+
+    /** Erstellt eine Aufgabe anhand eines Jsons
+     * @param Request $request
+     * @return Task
+     */
     public function createNewTask(Request $request): Task
     {
         $object = json_decode($request->getContent(), true);

@@ -21,6 +21,11 @@ class TasksController extends AbstractController
 
     }
 
+
+    /** Schnittstelle um eine neue Aufgabe zu erstellen
+     * @param Request $request
+     * @return JsonResponse
+     */
     #[Route(path: '', methods: ['POST'])]
     public function createNewTask(Request $request): JsonResponse
     {

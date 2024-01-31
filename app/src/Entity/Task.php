@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 class Task
 {
@@ -28,16 +29,26 @@ class Task
     #[ORM\Column]
     private ?bool $deleted = null;
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->TaskId;
     }
 
+    /**
+     * @return string|null
+     */
     public function getTitle(): ?string
     {
         return $this->title;
     }
 
+    /**
+     * @param string $titel
+     * @return $this
+     */
     public function setTitle(string $titel): static
     {
         $this->title = $titel;
@@ -45,11 +56,18 @@ class Task
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
+    /**
+     * @param string|null $description
+     * @return $this
+     */
     public function setDescription(?string $description): static
     {
         $this->description = $description;
@@ -57,11 +75,18 @@ class Task
         return $this;
     }
 
+    /**
+     * @return \DateTimeImmutable|null
+     */
     public function getDateOfExpiry(): ?\DateTimeImmutable
     {
         return $this->dateOfExpiry;
     }
 
+    /**
+     * @param \DateTimeImmutable $dateOfExpiry
+     * @return $this
+     */
     public function setDateOfExpiry(\DateTimeImmutable $dateOfExpiry): static
     {
         $this->dateOfExpiry = $dateOfExpiry;
@@ -69,11 +94,18 @@ class Task
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
     public function getPriority(): ?int
     {
         return $this->priority;
     }
 
+    /**
+     * @param int $priority
+     * @return $this
+     */
     public function setPriority(int $priority): static
     {
         $this->priority = $priority;
@@ -81,11 +113,18 @@ class Task
         return $this;
     }
 
+    /**
+     * @return bool|null
+     */
     public function isDeleted(): ?bool
     {
         return $this->deleted;
     }
 
+    /**
+     * @param bool $deleted
+     * @return $this
+     */
     public function setDeleted(bool $deleted): static
     {
         $this->deleted = $deleted;
@@ -93,9 +132,12 @@ class Task
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function jsonSerialize(): array
     {
-        return[
+        return [
             'id' => $this->TaskId,
             'title' => $this->title,
             'description' => $this->description,
