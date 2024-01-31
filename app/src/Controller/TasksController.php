@@ -14,7 +14,7 @@ class TasksController extends AbstractController
 
     private readonly TaskService $taskService;
 
-    public function __construcr(TaskService $taskService)
+    public function __construct(TaskService $taskService)
     {
 
         $this->taskService = $taskService;

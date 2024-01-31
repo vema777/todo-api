@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -21,16 +22,28 @@ class Task
     private ?string $description = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $dateOfExpiry = null;
+    private ?\DateTime $dateOfExpiry = null;
 
     #[ORM\Column]
-    private ?int $priority = null;
+    private ?\DateTime $createdAt;
+
+    #[ORM\Column]
+    private ?\DateTime $updatedAt;
+
+    #[ORM\Column]
+    private ?int $priority = 3;
 
     #[ORM\Column]
     private ?bool $deleted = false;
 
     #[ORM\Column]
-    private ?bool $done = null;
+    private ?bool $done = false;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
 
     /**
      * @return int|null
@@ -81,7 +94,7 @@ class Task
     /**
      * @return \DateTimeImmutable|null
      */
-    public function getDateOfExpiry(): ?\DateTimeImmutable
+    public function getDateOfExpiry(): ?\DateTime
     {
         return $this->dateOfExpiry;
     }
@@ -90,7 +103,7 @@ class Task
      * @param \DateTimeImmutable $dateOfExpiry
      * @return $this
      */
-    public function setDateOfExpiry(\DateTimeImmutable $dateOfExpiry): static
+    public function setDateOfExpiry(\DateTime $dateOfExpiry): static
     {
         $this->dateOfExpiry = $dateOfExpiry;
 
@@ -149,7 +162,6 @@ class Task
             'deleted' => $this->deleted,
             'done' => $this->done
         ];
-
     }
 
     public function getDone(): ?bool
@@ -160,5 +172,25 @@ class Task
     public function setDone(?bool $done): void
     {
         $this->done = $done;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
     }
 }

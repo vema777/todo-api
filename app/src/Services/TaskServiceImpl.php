@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\Task;
 use App\Repository\TaskRepository;
+use Cassandra\Date;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -36,10 +37,10 @@ class TaskServiceImpl implements TaskService
         $task = new Task();
         $task->setTitle($object['title']);
         $task->setDescription($object['description']);
-        $task->setPriority($object['3']);
-        $task->setDeleted($object['false']);
-        $task->setDateOfExpiry($object['dateOfExpiry']);
-        $task->setDone($object['false']);
+        $task->setPriority($object['priority']);
+        $task->setDeleted($object['deleted']);
+        $task->setDateOfExpiry(new \DateTime($object['dateOfExpiry']));
+        $task->setDone($object['done']);
         $this->entityManager->persist($task);
         $this->entityManager->flush();
         return $task;
