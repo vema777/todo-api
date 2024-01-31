@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TodoListRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
@@ -17,9 +19,24 @@ class TodoList implements JsonSerializable
     #[ORM\Column(length: 255, nullable: false)]
     private ?string $name;
 
+    #[ORM\OneToMany(mappedBy: '$list', targetEntity: Task::class)]
+    private Collection $tasks;
+
+    public function __construct()
+    {
+        $this->tasks = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -34,11 +51,23 @@ class TodoList implements JsonSerializable
         return $this;
     }
 
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function setTasks(Collection $tasks): static
+    {
+        $this->tasks = $tasks;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
-      return [
-          'id' => $this->id,
-          'name' => $this->name
-      ];
+        return [
+            'id' => $this->id,
+            'name' => $this->name
+        ];
     }
 }

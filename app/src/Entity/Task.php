@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
@@ -26,10 +27,10 @@ class Task implements JsonSerializable
     private ?\DateTime $dateOfExpiry = null;
 
     #[ORM\Column]
-    private ?\DateTime $createdAt;
+    private DateTime $createdAt;
 
     #[ORM\Column]
-    private ?\DateTime $updatedAt;
+    private DateTime $updatedAt;
 
     #[ORM\Column]
     private int $priority = 3;
@@ -40,10 +41,13 @@ class Task implements JsonSerializable
     #[ORM\Column]
     private bool $isDone = false;
 
+    #[ORM\ManyToOne(targetEntity: TodoList::class,cascade:["persist"],  inversedBy: 'tasks')]
+    private TodoList $list;
+
     public function __construct()
     {
-        $this->createdAt = new \DateTime();
-        $this->updatedAt = new \DateTime();
+        $this->createdAt = new DateTime();
+        $this->updatedAt = new DateTime();
     }
 
     /**
@@ -133,7 +137,7 @@ class Task implements JsonSerializable
     /**
      * @return bool|null
      */
-    public function isDeleted(): ?bool
+    public function GetisDeleted(): ?bool
     {
         return $this->isDeleted;
     }
@@ -163,7 +167,8 @@ class Task implements JsonSerializable
             'isDeleted' => $this->isDeleted,
             'isDone' => $this->isDone,
             'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt
+            'updatedAt' => $this->updatedAt,
+            'list' => $this->list
         ];
     }
 
@@ -195,5 +200,17 @@ class Task implements JsonSerializable
     public function setUpdatedAt(?\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
+    }
+
+    public function getList(): TodoList
+    {
+        return $this->list;
+    }
+
+    public function setList(TodoList $list): static
+    {
+        $this->list = $list;
+
+        return $this;
     }
 }
