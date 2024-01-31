@@ -5,18 +5,19 @@ namespace App\Entity;
 use App\Repository\TaskRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
-class Task
+class Task implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $TaskId = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $title;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
@@ -31,13 +32,13 @@ class Task
     private ?\DateTime $updatedAt;
 
     #[ORM\Column]
-    private ?int $priority = 3;
+    private int $priority = 3;
+
+    #[ORM\Column(nullable: false)]
+    private ?bool $isDeleted = false;
 
     #[ORM\Column]
-    private ?bool $deleted = false;
-
-    #[ORM\Column]
-    private ?bool $done = false;
+    private ?bool $isDone = false;
 
     public function __construct()
     {
@@ -134,16 +135,16 @@ class Task
      */
     public function isDeleted(): ?bool
     {
-        return $this->deleted;
+        return $this->isDeleted;
     }
 
     /**
-     * @param bool $deleted
+     * @param bool $isDeleted
      * @return $this
      */
-    public function setDeleted(bool $deleted): static
+    public function setIsDeleted(bool $isDeleted): static
     {
-        $this->deleted = $deleted;
+        $this->isDeleted = $isDeleted;
 
         return $this;
     }
@@ -159,19 +160,21 @@ class Task
             'description' => $this->description,
             'dateOfexpiry' => $this->dateOfExpiry,
             'priority' => $this->priority,
-            'deleted' => $this->deleted,
-            'done' => $this->done
+            'isDeleted' => $this->isDeleted,
+            'isDone' => $this->isDone,
+            'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt
         ];
     }
 
-    public function getDone(): ?bool
+    public function getIsDone(): ?bool
     {
-        return $this->done;
+        return $this->isDone;
     }
 
-    public function setDone(?bool $done): void
+    public function setIsDone(?bool $isDone): void
     {
-        $this->done = $done;
+        $this->isDone = $isDone;
     }
 
     public function getCreatedAt(): ?\DateTime
