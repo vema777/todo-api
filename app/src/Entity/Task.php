@@ -14,7 +14,7 @@ class Task implements JsonSerializable
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $TaskId = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: false)]
     private string $title;
@@ -51,7 +51,7 @@ class Task implements JsonSerializable
      */
     public function getId(): ?int
     {
-        return $this->TaskId;
+        return $this->id;
     }
 
     /**
@@ -155,7 +155,7 @@ class Task implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->TaskId,
+            'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
             'dateOfexpiry' => $this->dateOfExpiry,
