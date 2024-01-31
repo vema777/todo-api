@@ -137,7 +137,7 @@ class Task implements JsonSerializable
     /**
      * @return bool|null
      */
-    public function GetIsDeleted(): ?bool
+    public function getIsDeleted(): ?bool
     {
         return $this->isDeleted;
     }
