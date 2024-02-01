@@ -27,7 +27,10 @@ readonly class todoListsServiceImpl implements TodoListsService
      */
     public function getAllLists(): array
     {
-        return $this->todoListRepository->queryTodoLists();
+        $criteria = [
+            'isDeleted' => false
+        ];
+        return $this->todoListRepository->findBy($criteria);
     }
 
     /**
