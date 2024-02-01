@@ -35,7 +35,7 @@ class Task implements JsonSerializable
     #[ORM\Column]
     private int $priority = 3;
 
-    #[ORM\Column(nullable: false)]
+    #[ORM\Column]
     private bool $isDeleted = false;
 
     #[ORM\Column]
