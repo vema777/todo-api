@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use App\Services\TaskService;
+use App\Services\Tasks\TaskService;
+use App\TaskDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/api/tasks')]
@@ -21,11 +22,6 @@ class TasksController extends AbstractController
 
     }
 
-
-    /** Schnittstelle um eine neue Aufgabe zu erstellen
-     * @param Request $request
-     * @return JsonResponse
-     */
     #[Route(path: '', methods: ['POST'])]
     public function createNewTask(Request $request): JsonResponse
     {
@@ -33,5 +29,12 @@ class TasksController extends AbstractController
         $task = $this->taskService->createNewTask($request);
         return $this->json($task, JsonResponse::HTTP_CREATED);
 
+    }
+
+    #[Route(path: '/lists/{listId}', methods: ['GET'])]
+    public function findTaskByTodoList(int $listId)
+    {
+        $tasks = $this->taskService->getTasksByLists($listId);
+        return $this->json($tasks, JsonResponse::HTTP_ACCEPTED);
     }
 }
