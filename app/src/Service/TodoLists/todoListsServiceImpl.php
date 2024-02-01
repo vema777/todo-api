@@ -57,4 +57,21 @@ readonly class todoListsServiceImpl implements TodoListsService
 
         return $todoList;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteList(int $id): void
+    {
+        $todoList = $this->todoListRepository->find($id);
+
+        if (!$todoList) {
+            throw new NotFoundHttpException("Die Liste mit der Id: " .
+                $id . " wurde nicht gefunden");
+        }
+
+        $this->entityManager->remove($todoList);
+        $this->entityManager->flush();
+
+    }
 }

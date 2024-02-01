@@ -26,4 +26,10 @@ interface TodoListsService
      * @return TodoList Die gefundene Liste.
      */
     public function getSingleTodoList(int $id): TodoList;
+
+    /**
+     * Löscht eine Liste basiert auf die Id
+     * @param int $id die Id der Liste
+     */
+    public function deleteList(int $id): void;
 }
