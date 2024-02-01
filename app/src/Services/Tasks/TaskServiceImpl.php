@@ -8,6 +8,7 @@ use App\Repository\TaskRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TaskServiceImpl implements TaskService
 {
@@ -60,5 +61,23 @@ class TaskServiceImpl implements TaskService
     public function getTasksByLists(int $listId): array
     {
        return $this->taskRepository->findTaskByTodoList($listId);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteTask(int $id): void
+    {
+        $task = $this->taskRepository->find($id);
+
+        if (!$task){
+            throw new NotFoundHttpException("Die Aufgabe mit der Id: " .
+            $id . " wurde nicht gefunden");
+        }
+
+        $task->setIsDeleted(true);
+
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
     }
 }

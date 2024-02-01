@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Services\Tasks\TaskService;
-use App\TaskDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +34,14 @@ class TasksController extends AbstractController
     public function findTaskByTodoList(int $listId)
     {
         $tasks = $this->taskService->getTasksByLists($listId);
-        return $this->json($tasks, JsonResponse::HTTP_ACCEPTED);
+        return $this->json($tasks, JsonResponse::HTTP_OK);
+    }
+
+    #[Route(path: '/{id}', methods: ['DELETE'])]
+    public function deleteTask(int $id)
+    {
+        $this->taskService->deleteTask($id);
+        return $this->json(['message' => 'Aufgabe wurde erfolgreich gelöscht'], JsonResponse::HTTP_NO_CONTENT);
+
     }
 }

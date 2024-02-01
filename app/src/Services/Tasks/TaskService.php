@@ -11,15 +11,19 @@ interface TaskService
 
     /**
      * Mehtode um eine Aufgabe zu erstellen
-     * @param Request $reques
+     * @param Request $request Die Aufgabe die man erstellen möchte
      */
     public function createNewTask(Request $request);
 
-    /** Methode um alle Aufgaben von einer TodoListe zu hohlen.
-     * @param int $listId
-     * @return array
+    /** Methode um alle Aufgaben von einer TodoListe zu holen.
+     * @param int $listId Die Id einer TodoListe
+     * @return array Ein Array von Aufgaben
      */
     public function getTasksByLists(int $listId): array;
 
+    /** Löscht eine Aufgabe anhand der Id.
+     * @param int $id Id einer Aufgabe.
+     */
+    public function deleteTask(int $id): void;
 
 }
