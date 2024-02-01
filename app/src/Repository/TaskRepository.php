@@ -22,7 +22,7 @@ class TaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * Querry um alle Tasks anhand der Todo listen zu holen.
+     * Querry um alle Tasks anhand der TodoListen zu holen.
      * @param int $listId
      * @return array
      */
