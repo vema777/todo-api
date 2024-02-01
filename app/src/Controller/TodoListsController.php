@@ -2,12 +2,11 @@
 
 namespace App\Controller;
 
-use App\Service\TodoLists\TodoListsService;
+use App\Services\TodoLists\TodoListsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use OpenApi\Annotations as OA;
 
 #[Route(path: '/api/lists', name: "Listen")]
 class TodoListsController extends AbstractController

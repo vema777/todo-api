@@ -21,6 +21,21 @@ class TaskRepository extends ServiceEntityRepository
         parent::__construct($registry, Task::class);
     }
 
+    /**
+     * Querry um alle Tasks anhand der Todo listen zu holen.
+     * @param int $listId
+     * @return array
+     */
+    public function findTaskByTodoList(int $listId): array
+    {
+        return $this->createQueryBuilder('tasks')
+            ->andWhere('tasks.list = :val')
+            ->andWhere('tasks.isDeleted = false')
+            ->setParameter('val', $listId)
+            ->getQuery()
+            ->getResult();
+    }
+
 
 //    /**
 //     * @return Task[] Returns an array of Task objects

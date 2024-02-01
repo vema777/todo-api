@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\TodoLists;
+namespace App\Services\TodoLists;
 
 use App\Entity\TodoList;
 use App\Repository\TodoListRepository;
