@@ -27,7 +27,7 @@ readonly class todoListsServiceImpl implements TodoListsService
      */
     public function getAllLists(): array
     {
-        return $this->todoListRepository->findAll();
+        return $this->todoListRepository->queryTodoLists();
     }
 
     /**
@@ -56,5 +56,24 @@ readonly class todoListsServiceImpl implements TodoListsService
         }
 
         return $todoList;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteList(int $id): void
+    {
+        $todoList = $this->todoListRepository->find($id);
+
+        if (!$todoList) {
+            throw new NotFoundHttpException("Die Liste mit der Id: " .
+                $id . " wurde nicht gefunden");
+        }
+
+        $todoList->setIsDeleted(true);
+
+        $this->entityManager->persist($todoList);
+        $this->entityManager->flush();
+
     }
 }
