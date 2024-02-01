@@ -25,10 +25,23 @@ class TodoListsController extends AbstractController
         return $this->json($todoListsArr);
     }
 
-    #[Route(path: '',methods: ['POST'])]
+    #[Route(path: '', methods: ['POST'])]
     public function createTodoLists(Request $request): JsonResponse
     {
-        $todoList= $this->todoListsService->createTodoList($request);
+        $todoList = $this->todoListsService->createTodoList($request);
         return $this->json($todoList, JsonResponse::HTTP_CREATED);
+    }
+
+    #[Route(path: '/{id}', methods: ['GET'])]
+    public function getSingleList(int $id)
+    {
+        $todoList = $this->todoListsService->getSingleTodoList($id);
+        return $this->json($todoList);
+    }
+
+    #[Route(path: '/{id}', methods: ['DELETE'])]
+    public function deleteList(int $id){
+        $this->todoListsService->deleteList($id);
+        return $this->json(['message' => 'Liste wurde erfolgreich gelöscht'], JsonResponse::HTTP_NO_CONTENT );
     }
 }

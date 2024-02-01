@@ -17,7 +17,10 @@ class TodoList implements JsonSerializable
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: false)]
-    private ?string $name;
+    private string $name;
+
+    #[ORM\Column(nullable: false)]
+    private bool $isDeleted = false;
 
     #[ORM\OneToMany(mappedBy: '$list', targetEntity: Task::class)]
     private Collection $tasks;
@@ -47,6 +50,18 @@ class TodoList implements JsonSerializable
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getIsDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): static
+    {
+        $this->isDeleted = $isDeleted;
 
         return $this;
     }
