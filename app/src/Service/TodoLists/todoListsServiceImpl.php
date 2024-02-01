@@ -74,6 +74,24 @@ readonly class todoListsServiceImpl implements TodoListsService
 
         $this->entityManager->persist($todoList);
         $this->entityManager->flush();
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function editList(int $id, Request $request): void
+    {
+        $todoList = $this->todoListRepository->find($id);
+
+        if (!$todoList) {
+            throw new NotFoundHttpException("Die Liste mit der Id: " .
+                $id . " wurde nicht gefunden");
+        }
+
+        $object = json_decode($request->getContent(), true);
+        $todoList->setName($object['name']);
+
+        $this->entityManager->persist($todoList);
+        $this->entityManager->flush();
     }
 }
