@@ -26,4 +26,9 @@ interface TaskService
      */
     public function deleteTask(int $id): void;
 
+    /**
+     * @param int $id Die Id einer Aufgabe
+     * @param Request $request Die Aufgabe die man bearbeiten möchte.
+     */
+    public function editTask(int $id, Request $request): void;
 }

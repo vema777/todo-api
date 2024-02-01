@@ -44,4 +44,11 @@ class TasksController extends AbstractController
         return $this->json(['message' => 'Aufgabe wurde erfolgreich gelöscht'], JsonResponse::HTTP_NO_CONTENT);
 
     }
+
+    #[Route(path: '/{id}', methods: ['PUT'])]
+    public function editTask(int $id, Request $request)
+    {
+        $this->taskService->editTask($id, $request);
+        return $this->json(['message' => 'Aufgabe wurde erfolgreich bearbeitet'], JsonResponse::HTTP_NO_CONTENT);
+    }
 }
