@@ -15,7 +15,10 @@ class TodoList implements JsonSerializable
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: false)]
-    private ?string $name;
+    private string $name;
+
+    #[ORM\Column(nullable: false)]
+    private bool $isDeleted = false;
 
     public function getId(): ?int
     {
@@ -34,11 +37,23 @@ class TodoList implements JsonSerializable
         return $this;
     }
 
+    public function getIsDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): static
+    {
+        $this->isDeleted = $isDeleted;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
-      return [
-          'id' => $this->id,
-          'name' => $this->name
-      ];
+        return [
+            'id' => $this->id,
+            'name' => $this->name
+        ];
     }
 }
