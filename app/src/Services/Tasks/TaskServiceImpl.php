@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Tasks;
 
 use App\Entity\Task;
 use App\Entity\TodoList;
 use App\Repository\TaskRepository;
-use Cassandra\Date;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,10 +27,8 @@ class TaskServiceImpl implements TaskService
 
     }
 
-
-    /** Erstellt eine Aufgabe anhand eines Jsons
-     * @param Request $request
-     * @return Task
+    /**
+     * @inheritDoc
      */
     public function createNewTask(Request $request): Task
     {
@@ -55,5 +52,13 @@ class TaskServiceImpl implements TaskService
         $this->entityManager->persist($task);
         $this->entityManager->flush();
         return $task;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTasksByLists(int $listId): array
+    {
+       return $this->taskRepository->findTaskByTodoList($listId);
     }
 }
