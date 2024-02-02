@@ -42,7 +42,7 @@ class TaskServiceImpl implements TaskService
         $task->setTitle($object['title']);
         $task->setDescription($object['description']);
         $task->setPriority($object['priority']);
-        if(isset($object['dateOfExpiry'])){
+        if (isset($object['dateOfExpiry'])) {
             $task->setDateOfExpiry(new DateTime($object['dateOfExpiry']));
         }
         $task->setList($exisitngList);
@@ -58,7 +58,7 @@ class TaskServiceImpl implements TaskService
      */
     public function getTasksByLists(int $listId): array
     {
-       return $this->taskRepository->findTaskByTodoList($listId);
+        return $this->taskRepository->findTaskByTodoList($listId);
     }
 
     /**
@@ -68,12 +68,38 @@ class TaskServiceImpl implements TaskService
     {
         $task = $this->taskRepository->find($id);
 
-        if (!$task){
+        if (!$task) {
             throw new NotFoundHttpException("Die Aufgabe mit der Id: " .
-            $id . " wurde nicht gefunden");
+                $id . " wurde nicht gefunden");
         }
 
         $task->setIsDeleted(true);
+
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
+    }
+
+
+    public function editTask(int $id, Request $request): void
+    {
+        $task = $this->taskRepository->find($id);
+
+        if (!$task){
+            throw new NotFoundHttpException("Die Aufgabe mit der Id: " .
+            "wurde nicht gefunden");
+        }
+
+        $object = json_decode($request->getContent(), true);
+        $list = new TodoList();
+        $list->setName($object['list']['name']);
+        $list->setId($object['list']['id']);
+        $exisitngList = $this->entityManager->find(get_class($list), $list->getId());
+        $task->setTitle($object['title']);
+        $task->setDescription($object['description']);
+        $task->setPriority($object['priority']);
+        $task->setUpdatedAt(new DateTime());
+
+        $task->setList($exisitngList);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
