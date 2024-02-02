@@ -9,4 +9,4 @@ Im Docker-Terminal führt man aus dem Ordner /var/www/symfony_docker folgendes a
 - ./bin/console doctrine:database:create (wenn notwendig)
 - ./bin/console doctrine:migrations:migrate
 - ./bin/console doctrine:fixtures:load (um fake Daten zu laden)
- 
+- ./bin/console doctrine:query:sql "SELECT * FROM user"
