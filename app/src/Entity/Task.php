@@ -44,6 +44,10 @@ class Task implements JsonSerializable
     #[ORM\ManyToOne(targetEntity: TodoList::class,cascade:["persist"],  inversedBy: 'tasks')]
     private TodoList $list;
 
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->createdAt = new DateTime();
@@ -210,6 +214,18 @@ class Task implements JsonSerializable
     public function setList(TodoList $list): static
     {
         $this->list = $list;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
