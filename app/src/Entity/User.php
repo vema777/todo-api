@@ -50,11 +50,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class)]
     private Collection $tasks;
 
+    #[ORM\OneToMany(mappedBy: 'ownedBy', targetEntity: ApiToken::class)]
+    private Collection $apiTokens;
+
+    /* Scopes given during API authentication */
+    private ?array $accessTokenScopes = null;
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
+        $this->apiTokens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -89,7 +96,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        if (null === $this->accessTokenScopes) {
+            // logged in as a full, normal user
+            $roles = $this->roles;
+            $roles[] = 'ROLE_FULL_USER';
+        } else {
+            $roles = $this->accessTokenScopes;
+        }
+
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
@@ -218,5 +232,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, ApiToken>
+     */
+    public function getApiTokens(): Collection
+    {
+        return $this->apiTokens;
+    }
+
+    public function addApiToken(ApiToken $apiToken): static
+    {
+        if (!$this->apiTokens->contains($apiToken)) {
+            $this->apiTokens->add($apiToken);
+            $apiToken->setOwnedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApiToken(ApiToken $apiToken): static
+    {
+        if ($this->apiTokens->removeElement($apiToken)) {
+            // set the owning side to null (unless already changed)
+            if ($apiToken->getOwnedBy() === $this) {
+                $apiToken->setOwnedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getValidTokenStrings(): array
+    {
+        return $this->getApiTokens()
+            ->filter(fn (ApiToken $token) => $token->isValid())
+            ->map(fn (ApiToken $token) => $token->getToken())
+            ->toArray()
+        ;
+    }
+
+    public function markAsTokenAuthenticated(array $scopes): void
+    {
+        $this->accessTokenScopes = $scopes;
     }
 }

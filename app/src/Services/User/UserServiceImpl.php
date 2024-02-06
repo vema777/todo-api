@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Entity\ApiToken;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -47,6 +48,7 @@ class UserServiceImpl extends AbstractController implements UserService
      */
     public function getAllUsers(): array
     {
+        // TODO: change to findBy(['isDeleted' = false])?
         return $this->userRepository->findAll();
     }
 
@@ -63,18 +65,20 @@ class UserServiceImpl extends AbstractController implements UserService
      */
     public function createNewUser(Request $request)
     {
-        $email = $request->get('email');
-        $password = $request->get('password');
-        $firstName = $request->get('firstName');
-        $lastName = $request->get('lastName');
-
+        $data = json_decode($request->getContent(), true);
         $user = new User();
-        $user->setEmail($email);
-        $user->setPassword($this->passwordHasher->hashPassword($user, $password));
-        $user->setFirstName($firstName);
-        $user->setLastName($lastName);
+        $user->setEmail($data['email']);
+        $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
+        $user->setFirstName($data['firstName']);
+        $user->setLastName($data['lastName']);
 
         $this->entityManager->persist($user);
+
+        // TODO: move the creation of the token to a separate controller
+        $apiToken = new ApiToken();
+        $apiToken->setOwnedBy($user);
+        $this->entityManager->persist($apiToken);
+
         $this->entityManager->flush();
 
         return $user;

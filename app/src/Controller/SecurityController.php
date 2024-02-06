@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class SecurityController extends AbstractController
 {
-    #[Route('/api/login', name: 'api_login')]
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): Response
     {
         if ($user === null) {
@@ -19,16 +19,10 @@ class SecurityController extends AbstractController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $token = "test_token";
-
         return new Response(null, 204, [
-            'User-Id' => $user->getId()
+            'User-Id' => $user->getId(),
+            'Api-Token' => $user->getValidTokenStrings(),
         ]);
-
-        /*return $this->json([
-            'user' => $user->getUserIdentifier(),
-            'token' => $token
-        ]);*/
     }
 
     #[Route('/logout', name: 'api_logout')]

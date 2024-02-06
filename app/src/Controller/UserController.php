@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class UserController extends AbstractController
@@ -31,10 +32,19 @@ class UserController extends AbstractController
     #[Route('/api/users/{id}', methods: ['GET'])]
     public function getUserById(int $id): Response
     {
-        // TODO: remove password from return and isDeleted
         $user = $this->userService->getUserById($id);
         return $this->json(
-            $this->normalizer->normalize($user, 'json')
+            $this->normalizer->normalize($user, 'json', [
+                AbstractNormalizer::ATTRIBUTES => [
+                    'id',
+                    'email',
+                    'roles',
+                    'firstName',
+                    'lastName',
+                    'createdAt',
+                    'updatedAt',
+                ]
+            ])
         );
     }
 
@@ -48,11 +58,21 @@ class UserController extends AbstractController
     {
         $allUsers = $this->userService->getAllUsers();
         return $this->json(
-            $this->normalizer->normalize($allUsers, 'json')
+            $this->normalizer->normalize($allUsers, 'json', [
+                AbstractNormalizer::ATTRIBUTES => [
+                    'id',
+                    'email',
+                    'roles',
+                    'firstName',
+                    'lastName',
+                    'createdAt',
+                    'updatedAt',
+                ]
+            ])
         );
     }
 
-    #[Route('/api/user', methods: ['POST'])]
+    #[Route('/api/users', methods: ['POST'])]
     public function createNewUser(Request $request): Response
     {
         $user = $this->userService->createNewUser($request);
@@ -61,7 +81,8 @@ class UserController extends AbstractController
             .$user->getEmail().' '
             .$user->getPassword().' '
             .$user->getFirstName().' '
-            .$user->getLastName()
+            .$user->getLastName().' '
+//            .$user->getValidTokenStrings()
         );
     }
 }
