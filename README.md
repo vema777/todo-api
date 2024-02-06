@@ -10,3 +10,6 @@ Im Docker-Terminal führt man aus dem Ordner /var/www/symfony_docker folgendes a
 - ./bin/console doctrine:migrations:migrate
 - ./bin/console doctrine:fixtures:load (um fake Daten zu laden)
 - ./bin/console doctrine:query:sql "SELECT * FROM user"
+
+Alle fake-User haben das Passwort "password"  
+Es wird auch ein fake-User mit der E-Mail "email" erstellt

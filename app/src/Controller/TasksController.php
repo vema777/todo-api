@@ -11,23 +11,18 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(path: '/api/tasks')]
 class TasksController extends AbstractController
 {
-
     private readonly TaskService $taskService;
 
     public function __construct(TaskService $taskService)
     {
-
         $this->taskService = $taskService;
-
     }
 
     #[Route(path: '', methods: ['POST'])]
     public function createNewTask(Request $request): JsonResponse
     {
-
         $task = $this->taskService->createNewTask($request);
         return $this->json($task, JsonResponse::HTTP_CREATED);
-
     }
 
     #[Route(path: '/lists/{listId}', methods: ['GET'])]
@@ -42,6 +37,5 @@ class TasksController extends AbstractController
     {
         $this->taskService->deleteTask($id);
         return $this->json(['message' => 'Aufgabe wurde erfolgreich gelöscht'], JsonResponse::HTTP_NO_CONTENT);
-
     }
 }
