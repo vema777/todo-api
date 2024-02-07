@@ -2,7 +2,7 @@ Diese ist das Backend für die Todo-Anwendung "Complete". Um es ausführen zu k�
 macht man der Terminal auf: 
 
 - docker compose up -d --build
-- docker exec -it complete-api-php-1 bash.
+- docker compose exec php /bin/bash.
 
 Im Docker-Terminal führt man aus dem Ordner /var/www/symfony_docker folgendes aus:
 
