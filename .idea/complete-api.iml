@@ -10,7 +10,6 @@
       <sourceFolder url="file://$MODULE_DIR$/app/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/app/spec" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/doctrine/cache" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/doctrine/collections" />
