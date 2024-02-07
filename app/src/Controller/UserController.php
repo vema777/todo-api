@@ -72,17 +72,11 @@ class UserController extends AbstractController
         );
     }
 
-    #[Route('/api/users', methods: ['POST'])]
+    #[Route('/api/users/logup', methods: ['POST'])]
     public function createNewUser(Request $request): Response
     {
-        $user = $this->userService->createNewUser($request);
+        $UserIdAndToken = $this->userService->createNewUser($request);
 
-        return new Response('Saved new user with data: '
-            .$user->getEmail().' '
-            .$user->getPassword().' '
-            .$user->getFirstName().' '
-            .$user->getLastName().' '
-//            .$user->getValidTokenStrings()
-        );
+        return $this->json($UserIdAndToken);
     }
 }

@@ -41,9 +41,9 @@ interface UserService
     /**
      * Erstellt einen neuen Nutzer
      * @param Request $request POST-Request mit Nutzerdaten
-     * @return mixed
+     * @return array Array in der Form ['userId' => $user->getId(), 'apiToken' => $apiToken->getToken()]
      */
-    public function createNewUser(Request $request);
+    public function createNewUser(Request $request): array;
 
     /**
      * Setzt die Eigenschaft isDeleted bei einem Nutzer auf true

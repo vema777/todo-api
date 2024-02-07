@@ -63,25 +63,29 @@ class UserServiceImpl extends AbstractController implements UserService
     /**
      * @inheritDoc
      */
-    public function createNewUser(Request $request)
+    public function createNewUser(Request $request): array
     {
         $data = json_decode($request->getContent(), true);
+
         $user = new User();
         $user->setEmail($data['email']);
         $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
         $user->setFirstName($data['firstName']);
         $user->setLastName($data['lastName']);
-
         $this->entityManager->persist($user);
 
-        // TODO: move the creation of the token to a separate controller
         $apiToken = new ApiToken();
         $apiToken->setOwnedBy($user);
         $this->entityManager->persist($apiToken);
 
         $this->entityManager->flush();
 
-        return $user;
+        // for some reason $user->getValidTokenStrings() returns an empty array in this scope
+        // but if you login with the created user after creation, getValidTokenStrings() works as intended
+        return [
+            'userId' => $user->getId(),
+            'apiToken' => $apiToken->getToken()
+        ];
     }
 
     /**

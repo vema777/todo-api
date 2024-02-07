@@ -19,9 +19,9 @@ class SecurityController extends AbstractController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        return new Response(null, 204, [
-            'User-Id' => $user->getId(),
-            'Api-Token' => $user->getValidTokenStrings(),
+        return $this->json([
+            'userId' => $user->getId(),
+            'apiToken' => $user->getValidTokenStrings()[0]
         ]);
     }
 
