@@ -13,24 +13,23 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // erstellt immer einen Eigentümer-User
-        /*$ownerUser = UserFactory::createOne([
+        $ownerUser = UserFactory::createOne([
             'email' => 'organization_owner',
             'password' => 'password',
             'is_deleted' => false,
             'roles' => ['ROLE_ORGANIZATION_OWNER'],
-
         ]);
-        ApiTokenFactory::createOne(['ownedBy' => $ownerUser]);*/
+        ApiTokenFactory::createOne(['ownedBy' => $ownerUser]);
         // erstellt immer einen Admin User
-        /*$adminUser = UserFactory::createOne([
+        $adminUser = UserFactory::createOne([
             'email' => 'admin',
             'password' => 'password',
             'is_deleted' => false,
             'roles' => ['ROLE_ADMIN'],
         ]);
-        ApiTokenFactory::createOne(['ownedBy' => $adminUser]);*/
+        ApiTokenFactory::createOne(['ownedBy' => $adminUser]);
         // erstellt einen normalen User
-        /*$normalUser = UserFactory::createOne([
+        $normalUser = UserFactory::createOne([
             'email' => 'user',
             'password' => 'password',
             'is_deleted' => false,
@@ -42,13 +41,20 @@ class AppFixtures extends Fixture
             return [
                 'ownedBy' => UserFactory::new(),
             ];
-        });*/
+        });
 
-        OrganizationFactory::createMany(
-            3,
-            ['users' => UserFactory::new()->many(3, 6)]
-        );
+        OrganizationFactory::createMany(3, function () {
+            return [
+                'owner' => UserFactory::createOne([
+                    'password' => 'password',
+                    'is_deleted' => false,
+                    'roles' => ['ROLE_ORGANIZATION_OWNER'],
+                ]),
+            ];
+        });
 
-
+        OrganizationFactory::createMany(3, [
+            'users' => UserFactory::new()->many(3, 6)
+        ]);
     }
 }
