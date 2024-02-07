@@ -56,12 +56,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /* Scopes given during API authentication */
     private ?array $accessTokenScopes = null;
 
+    #[ORM\ManyToMany(targetEntity: Organization::class, inversedBy: 'users')]
+    private Collection $Organization;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Organization::class)]
+    private Collection $organizationsOwned;
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
         $this->apiTokens = new ArrayCollection();
+        $this->Organization = new ArrayCollection();
+        $this->organizationsOwned = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -279,5 +287,59 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function markAsTokenAuthenticated(array $scopes): void
     {
         $this->accessTokenScopes = $scopes;
+    }
+
+    /**
+     * @return Collection<int, Organization>
+     */
+    public function getOrganization(): Collection
+    {
+        return $this->Organization;
+    }
+
+    public function addOrganization(Organization $organization): static
+    {
+        if (!$this->Organization->contains($organization)) {
+            $this->Organization->add($organization);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganization(Organization $organization): static
+    {
+        $this->Organization->removeElement($organization);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Organization>
+     */
+    public function getOrganizationsOwned(): Collection
+    {
+        return $this->organizationsOwned;
+    }
+
+    public function addOrganizationsOwned(Organization $organizationsOwned): static
+    {
+        if (!$this->organizationsOwned->contains($organizationsOwned)) {
+            $this->organizationsOwned->add($organizationsOwned);
+            $organizationsOwned->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganizationsOwned(Organization $organizationsOwned): static
+    {
+        if ($this->organizationsOwned->removeElement($organizationsOwned)) {
+            // set the owning side to null (unless already changed)
+            if ($organizationsOwned->getOwner() === $this) {
+                $organizationsOwned->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }

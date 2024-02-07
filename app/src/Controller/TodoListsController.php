@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/api/lists', name: "Listen")]
 class TodoListsController extends AbstractController
@@ -26,6 +27,7 @@ class TodoListsController extends AbstractController
     }
 
     #[Route(path: '', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function createTodoLists(Request $request): JsonResponse
     {
         $todoList = $this->todoListsService->createTodoList($request);
