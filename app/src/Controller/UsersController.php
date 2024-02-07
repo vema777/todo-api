@@ -33,7 +33,7 @@ class UsersController extends AbstractController
      * @throws ExceptionInterface
      */
     #[Route('/{id}', methods: ['GET'])]
-    public function getUserById(int $id): Response
+    public function getUserById(int $id): JsonResponse
     {
         $user = $this->userService->getUserById($id);
         return $this->json(
@@ -76,7 +76,7 @@ class UsersController extends AbstractController
     }
 
     #[Route('/login', name: 'api_login', methods: ['POST'])]
-    public function login(#[CurrentUser] ?User $user): Response
+    public function login(#[CurrentUser] ?User $user): JsonResponse
     {
         if ($user === null) {
             return $this->json([
@@ -87,14 +87,14 @@ class UsersController extends AbstractController
         return $this->json([
             'userId' => $user->getId(),
             'apiToken' => $user->getValidTokenStrings()[0]
-        ]);
+        ], JsonResponse::HTTP_OK);
     }
 
     #[Route('/logup', methods: ['POST'])]
-    public function createNewUser(Request $request): Response
+    public function createNewUser(Request $request): JsonResponse
     {
         $UserIdAndToken = $this->userService->createNewUser($request);
 
-        return $this->json($UserIdAndToken);
+        return $this->json($UserIdAndToken, JsonResponse::HTTP_CREATED);
     }
 }
