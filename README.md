@@ -13,3 +13,25 @@ Im Docker-Terminal führt man aus dem Ordner /var/www/symfony_docker folgendes a
 
 Alle fake-User haben das Passwort "password"  
 Es wird auch ein fake-User mit der E-Mail "email" erstellt
+
+Einen neuen User kann man mit Postman erstellen, indem man ein POST-Request auf:  
+localhost:8080/api/users/logup  
+mit folgendem JSON Inhalt schickt:  
+{
+"email": "test_email",
+"password": "password",
+"firstName": "firstName",
+"lastName": "lastName"
+}  
+  
+Man kann sich einloggen, indem man ein POST-Request auf  
+localhost:8080/api/login  
+mit folgendem JSON-Inhalt schickt:  
+{
+"email": "test_email9",
+"password": "password"
+}  
+  
+Nach dem Einloggen und Registrieren wird zurück ein gültiges API-Token zurückgeschickt  
+
+Bei API-Abfragen wie localhost:8080/api/users muss man in Postman im Tab "Authorization" - Type auf "Bearer Token" setzen und ins Feld "Token" rechts ein gültiges Token einfügen
