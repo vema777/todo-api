@@ -7,6 +7,10 @@
       <sourceFolder url="file://$MODULE_DIR$/complete_api/tests" isTestSource="true" packagePrefix="App\Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/app/src" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/app/tests" isTestSource="true" packagePrefix="App\Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/app/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/app/spec" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/doctrine/cache" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/doctrine/collections" />
@@ -122,6 +126,21 @@
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/twig/twig" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/webmozart/assert" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/zircote/swagger-php" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/doctrine/data-fixtures" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/doctrine/doctrine-fixtures-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/fakerphp/faker" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/psr/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/password-hasher" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/property-access" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/security-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/security-core" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/security-csrf" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/security-http" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/symfony/serializer" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/zenstruck/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/zenstruck/callback" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/zenstruck/foundry" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -2,13 +2,11 @@
 
 namespace App\Services\Tasks;
 
-
 use App\Entity\TodoList;
 use Symfony\Component\HttpFoundation\Request;
 
 interface TaskService
 {
-
     /**
      * Mehtode um eine Aufgabe zu erstellen
      * @param Request $request Die Aufgabe die man erstellen möchte

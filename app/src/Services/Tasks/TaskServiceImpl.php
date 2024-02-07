@@ -22,10 +22,8 @@ class TaskServiceImpl implements TaskService
         EntityManagerInterface $entityManager
     )
     {
-
         $this->taskRepository = $taskRepository;
         $this->entityManager = $entityManager;
-
     }
 
     /**
