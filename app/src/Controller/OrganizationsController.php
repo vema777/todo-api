@@ -85,7 +85,7 @@ class OrganizationsController extends AbstractController
     #[IsGranted('ROLE_ORGANIZATION_OWNER', 'ROLE_ORGANIZATION_ADMIN')]
     public function addUserToOrganization(int $organizationId, int $userId): JsonResponse
     {
-        $this->organizationService->addUser($organizationId, $userId);
+        $this->organizationService->addUserToOrganization($organizationId, $userId);
         return $this->json([
             'message' => 'Nutzer wurde erfolgreich zu der Organisation hinzugefügt'
         ], JsonResponse::HTTP_NO_CONTENT);
@@ -95,7 +95,7 @@ class OrganizationsController extends AbstractController
     #[IsGranted('ROLE_ORGANIZATION_OWNER', 'ROLE_ORGANIZATION_ADMIN')]
     public function removeUserFromOrganization(int $organizationId, int $userId): JsonResponse
     {
-        $this->organizationService->removeUser($organizationId, $userId);
+        $this->organizationService->removeUserFromOrganization($organizationId, $userId);
         return $this->json([
             'message' => 'Nutzer wurde erfolgreich aus der Organisation entfernt'
         ], JsonResponse::HTTP_NO_CONTENT);

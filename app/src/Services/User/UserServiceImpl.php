@@ -15,16 +15,19 @@ class UserServiceImpl extends AbstractController implements UserService
     private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
     private UserPasswordHasherInterface $passwordHasher;
+    private readonly UserService $userService;
 
     public function __construct(
         UserRepository              $userRepository,
         EntityManagerInterface      $entityManager,
         UserPasswordHasherInterface $passwordHasher,
+        UserService                 $userService,
     )
     {
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
         $this->passwordHasher = $passwordHasher;
+        $this->userService = $userService;
     }
 
     /**
@@ -48,8 +51,7 @@ class UserServiceImpl extends AbstractController implements UserService
      */
     public function getAllUsers(): array
     {
-        // TODO: change to findBy(['isDeleted' = false])?
-        return $this->userRepository->findAll();
+        return $this->userRepository->findBy(['isDeleted' => false]);
     }
 
     /**
@@ -74,6 +76,7 @@ class UserServiceImpl extends AbstractController implements UserService
         $user->setLastName($data['lastName']);
         $this->entityManager->persist($user);
 
+        // each user has one API token
         $apiToken = new ApiToken();
         $apiToken->setOwnedBy($user);
         $this->entityManager->persist($apiToken);
@@ -84,20 +87,38 @@ class UserServiceImpl extends AbstractController implements UserService
         // but if you login with the created user after creation, getValidTokenStrings() works as intended
         return [
             'userId' => $user->getId(),
-            'apiToken' => $apiToken->getToken()
+            'apiToken' => $apiToken->getToken(),
         ];
     }
 
     /**
      * @inheritDoc
      */
-    public function deleteUser(int $id)
+    public function editUser(int $id, Request $request): void
     {
-        $user = $this->userRepository->find($id);
-        $user->setIsDeleted(true);
+        $data = json_decode($request->getContent(), true);
+
+        $user = $this->getUserById($id);
+        // TODO: ask Pierre which properties need to be changed
+        // TODO: maybe implement logic to check for passed values and only change them?
+        $user->setEmail($data['email']);
+        $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
+        $user->setFirstName($data['firstName']);
+        $user->setLastName($data['lastName']);
+
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-        // TODO: change return $id to something else...
-        return $id;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteUser(int $id): void
+    {
+        $user = $this->userService->getUserById($id);
+        $user->setIsDeleted(true);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
     }
 }

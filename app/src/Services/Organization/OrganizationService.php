@@ -49,7 +49,7 @@ interface OrganizationService
      * @param int $userId
      * @return void
      */
-    public function addUser(int $organizationId, int $userId): void;
+    public function addUserToOrganization(int $organizationId, int $userId): void;
 
     /**
      * Entfernt einen Nutzer aus einer Organisation
@@ -57,5 +57,5 @@ interface OrganizationService
      * @param int $userId
      * @return void
      */
-    public function removeUser(int $organizationId, int $userId): void;
+    public function removeUserFromOrganization(int $organizationId, int $userId): void;
 }

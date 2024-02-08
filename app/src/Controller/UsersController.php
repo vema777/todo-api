@@ -52,7 +52,7 @@ class UsersController extends AbstractController
     }
 
     /**
-     * Gibt ein Array mit allen Nutzerobjekten zurück
+     * Gibt ein JSON-Array mit allen Nutzerobjekten zurück
      * @return JsonResponse
      * @throws ExceptionInterface
      */

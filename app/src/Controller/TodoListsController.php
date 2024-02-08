@@ -18,44 +18,47 @@ class TodoListsController extends AbstractController
     {
         $this->todoListsService = $todoListsService;
     }
+    #[Route(path: '/{id}', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function getTodoListById(int $id)
+    {
+        $todoList = $this->todoListsService->getTodoListById($id);
+        return $this->json($todoList);
+    }
 
     #[Route(path: '', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function getAllLists(): JsonResponse
+    public function getAllTodoLists(): JsonResponse
     {
-        $todoListsArr = $this->todoListsService->getAllLists();
+        $todoListsArr = $this->todoListsService->getAllTodoLists();
         return $this->json($todoListsArr);
     }
 
     #[Route(path: '', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function createTodoLists(Request $request): JsonResponse
+    public function createTodoList(Request $request): JsonResponse
     {
         $todoList = $this->todoListsService->createTodoList($request);
         return $this->json($todoList, JsonResponse::HTTP_CREATED);
     }
 
-    #[Route(path: '/{id}', methods: ['GET'])]
+    #[Route(path: '/{id}', methods: ['PUT'])]
     #[IsGranted('ROLE_USER')]
-    public function getSingleList(int $id)
+    public function editTodoList(int $id, Request $request): JsonResponse
     {
-        $todoList = $this->todoListsService->getSingleTodoList($id);
-        return $this->json($todoList);
+        $this->todoListsService->editList($id, $request);
+        return $this->json([
+            'message' => 'Liste wurde erfolgreich bearbeitet'
+        ], JsonResponse::HTTP_NO_CONTENT);
     }
 
     #[Route(path: '/{id}', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]
-    public function deleteList(int $id)
+    public function deleteTodoList(int $id): JsonResponse
     {
         $this->todoListsService->deleteList($id);
-        return $this->json(['message' => 'Liste wurde erfolgreich gelöscht'], JsonResponse::HTTP_NO_CONTENT);
-    }
-
-    #[Route(path: '/{id}', methods: ['PUT'])]
-    #[IsGranted('ROLE_USER')]
-    public function editList(int $id, Request $request)
-    {
-        $this->todoListsService->editList($id, $request);
-        return $this->json(['message' => 'Liste wurde erfolgreich bearbeitet'], JsonResponse::HTTP_NO_CONTENT);
+        return $this->json([
+            'message' => 'Liste wurde erfolgreich gelöscht'
+        ], JsonResponse::HTTP_NO_CONTENT);
     }
 }
