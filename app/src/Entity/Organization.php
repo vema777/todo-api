@@ -32,7 +32,7 @@ class Organization
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column]
-    private ?bool $isDeleted = false;
+    private bool $isDeleted = false;
 
     public function __construct()
     {

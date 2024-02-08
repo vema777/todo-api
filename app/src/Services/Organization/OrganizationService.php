@@ -3,7 +3,9 @@
 namespace App\Services\Organization;
 
 use App\Entity\Organization;
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 interface OrganizationService
 {
@@ -18,11 +20,14 @@ interface OrganizationService
      */
     public function getAllOrganizations(): array;
 
+    public function getOrganizationsBy(array $criteria, array $orderBy = null, $limit = null, $offset = null): array;
+
     /**
      * @param Request $request
-     * @return Organization
+     * @param User|null $user
+     * @return int
      */
-    public function createOrganization(Request $request): Organization;
+    public function createOrganization(Request $request, #[CurrentUser] ?User $user): int;
 
     /**
      * Endpoint zum Ändern des Namens der Organisation
@@ -40,15 +45,17 @@ interface OrganizationService
 
     /**
      * Fügt einen Nutzer zu einer Organisation hinzu
-     * @param Request $request Request mit POST-Parametern organisationId und userId
+     * @param int $organizationId
+     * @param int $userId
      * @return void
      */
-    public function addUser(Request $request): void;
+    public function addUser(int $organizationId, int $userId): void;
 
     /**
      * Entfernt einen Nutzer aus einer Organisation
-     * @param Request $request Request mit POST-Parametern organisationId und userId
+     * @param int $organizationId
+     * @param int $userId
      * @return void
      */
-    public function removeUser(Request $request): void;
+    public function removeUser(int $organizationId, int $userId): void;
 }

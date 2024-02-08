@@ -13,7 +13,6 @@ class ApiTokenHandler implements AccessTokenHandlerInterface
 {
     public function __construct(private ApiTokenRepository $apiTokenRepository)
     {
-
     }
     public function getUserBadgeFrom(#[\SensitiveParameter] string $accessToken): UserBadge
     {

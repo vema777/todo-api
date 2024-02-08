@@ -53,8 +53,15 @@ class AppFixtures extends Fixture
             ];
         });
 
-        OrganizationFactory::createMany(3, [
-            'users' => UserFactory::new()->many(3, 6)
-        ]);
+        OrganizationFactory::createMany(3, function () {
+            return [
+                'users' => UserFactory::new()->many(3, 6),
+                'owner' => UserFactory::createOne([
+                    'password' => 'password',
+                    'is_deleted' => false,
+                    'roles' => ['ROLE_ORGANIZATION_OWNER'],
+                ]),
+            ];
+        });
     }
 }

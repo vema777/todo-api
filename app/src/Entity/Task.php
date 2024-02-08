@@ -44,9 +44,17 @@ class Task implements JsonSerializable
     #[ORM\ManyToOne(targetEntity: TodoList::class,cascade:["persist"],  inversedBy: 'tasks')]
     private TodoList $list;
 
-    #[ORM\ManyToOne(inversedBy: 'tasks')]
-    #[ORM\JoinColumn(nullable: false)]
+    /**
+     * @var User|null creator / author of the task
+     */
+    #[ORM\ManyToOne(inversedBy: 'tasks')] // TODO default - null only if the user is in an organization
     private ?User $user = null;
+
+    //TODO: add relation to organization so that tasks are also "owned" by a single organization
+
+    //TODO: add assignees
+
+    //TODO: add property "isOrganisationalTask"
 
     public function __construct()
     {
