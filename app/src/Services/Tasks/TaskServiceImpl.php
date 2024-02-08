@@ -78,6 +78,9 @@ class TaskServiceImpl implements TaskService
     }
 
 
+    /**
+     * @inheritDoc
+     */
     public function editTask(int $id, Request $request): void
     {
         $task = $this->taskRepository->find($id);
@@ -101,5 +104,13 @@ class TaskServiceImpl implements TaskService
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTasksByUserId(int $userId): array
+    {
+        return $this->taskRepository->findTaskByUserId($userId);
     }
 }
