@@ -15,19 +15,17 @@ class UserServiceImpl extends AbstractController implements UserService
     private UserRepository $userRepository;
     private EntityManagerInterface $entityManager;
     private UserPasswordHasherInterface $passwordHasher;
-    private readonly UserService $userService;
 
     public function __construct(
         UserRepository              $userRepository,
         EntityManagerInterface      $entityManager,
         UserPasswordHasherInterface $passwordHasher,
-        UserService                 $userService,
+
     )
     {
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
         $this->passwordHasher = $passwordHasher;
-        $this->userService = $userService;
     }
 
     /**
@@ -115,7 +113,7 @@ class UserServiceImpl extends AbstractController implements UserService
      */
     public function deleteUser(int $id): void
     {
-        $user = $this->userService->getUserById($id);
+        $user = $this->getUserById($id);
         $user->setIsDeleted(true);
 
         $this->entityManager->persist($user);

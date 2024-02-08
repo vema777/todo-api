@@ -48,6 +48,7 @@ class Task implements JsonSerializable
      * @var User|null creator / author of the task
      */
     #[ORM\ManyToOne(inversedBy: 'tasks')] // TODO default - null only if the user is in an organization
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
     //TODO: add relation to organization so that tasks are also "owned" by a single organization

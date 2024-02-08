@@ -18,15 +18,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class UsersController extends AbstractController
 {
     private readonly UserService $userService;
-    private NormalizerInterface $normalizer;
 
     public function __construct(
         UserService         $userService,
-        NormalizerInterface $normalizer,
     )
     {
         $this->userService = $userService;
-        $this->normalizer = $normalizer;
     }
 
     /**
@@ -36,43 +33,18 @@ class UsersController extends AbstractController
     public function getUserById(int $id): Response
     {
         $user = $this->userService->getUserById($id);
-        return $this->json(
-            $this->normalizer->normalize($user, 'json', [
-                AbstractNormalizer::ATTRIBUTES => [
-                    'id',
-                    'email',
-                    'roles',
-                    'firstName',
-                    'lastName',
-                    'createdAt',
-                    'updatedAt',
-                ]
-            ])
-        );
+        return $this->json($user, 200, [], ['groups' => ['main']]);
     }
 
     /**
      * Gibt ein JSON-Array mit allen Nutzerobjekten zurück
      * @return JsonResponse
-     * @throws ExceptionInterface
      */
     #[Route('', methods: ['GET'])]
     public function getAllUsers(): JsonResponse
     {
         $allUsers = $this->userService->getAllUsers();
-        return $this->json(
-            $this->normalizer->normalize($allUsers, 'json', [
-                AbstractNormalizer::ATTRIBUTES => [
-                    'id',
-                    'email',
-                    'roles',
-                    'firstName',
-                    'lastName',
-                    'createdAt',
-                    'updatedAt',
-                ]
-            ])
-        );
+        return $this->json($allUsers, 200, [], ['groups' => ['main']]);
     }
 
     #[Route('/login', name: 'api_login', methods: ['POST'])]
