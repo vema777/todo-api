@@ -55,6 +55,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isDeleted = false;
 
+    /**
+     * @var Collection|ArrayCollection vom Nutzer erstellte Aufgaben
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class)]
     private Collection $tasks;
 
@@ -64,11 +67,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /* Scopes given during API authentication */
     private ?array $accessTokenScopes = null;
 
+    /**
+     * @var Collection|ArrayCollection Organisationen, bei denen der Nutzer Mitglied ist
+     */
     #[ORM\ManyToMany(targetEntity: Organization::class, inversedBy: 'users')]
-    private Collection $Organization;
+    private Collection $organization;
 
+    /**
+     * @var Collection|ArrayCollection Organisationen, bei denen der Nutzer der Eigentümer der Organisation ist
+     */
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Organization::class)]
     private Collection $organizationsOwned;
+
+    /**
+     * @var Collection|ArrayCollection diesem Nutzer zugewiesene Aufgaben
+     */
+    #[ORM\ManyToMany(targetEntity: Task::class, mappedBy: 'assignees')]
+    private Collection $assignedTasks;
 
     public function __construct()
     {
@@ -76,8 +91,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
         $this->apiTokens = new ArrayCollection();
-        $this->Organization = new ArrayCollection();
+        $this->organization = new ArrayCollection();
         $this->organizationsOwned = new ArrayCollection();
+        $this->assignedTasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -302,13 +318,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getOrganization(): Collection
     {
-        return $this->Organization;
+        return $this->organization;
     }
 
     public function addOrganization(Organization $organization): static
     {
-        if (!$this->Organization->contains($organization)) {
-            $this->Organization->add($organization);
+        if (!$this->organization->contains($organization)) {
+            $this->organization->add($organization);
         }
 
         return $this;
@@ -316,7 +332,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeOrganization(Organization $organization): static
     {
-        $this->Organization->removeElement($organization);
+        $this->organization->removeElement($organization);
 
         return $this;
     }
@@ -346,6 +362,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($organizationsOwned->getOwner() === $this) {
                 $organizationsOwned->setOwner(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getAssignedTasks(): Collection
+    {
+        return $this->assignedTasks;
+    }
+
+    public function addAssignedTask(Task $assignedTask): static
+    {
+        if (!$this->assignedTasks->contains($assignedTask)) {
+            $this->assignedTasks->add($assignedTask);
+            $assignedTask->addAssignee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTask(Task $assignedTask): static
+    {
+        if ($this->assignedTasks->removeElement($assignedTask)) {
+            $assignedTask->removeAssignee($this);
         }
 
         return $this;

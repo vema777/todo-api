@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\TaskRepository;
 use DateTime;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
@@ -51,16 +53,29 @@ class Task implements JsonSerializable
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    //TODO: add relation to organization so that tasks are also "owned" by a single organization
+    /**
+     * @var Organization|null die Organisation, zu der diese Aufgabe gehört
+     */
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    private ?Organization $organization = null;
 
-    //TODO: add assignees
+    /**
+     * @var bool|null ob die Aufgabe zu einer Organisation gehört oder nicht
+     */
+    #[ORM\Column]
+    private ?bool $isOrganisational = null;
 
-    //TODO: add property "isOrganisationalTask"
+    /**
+     * @var Collection|ArrayCollection Nutzer, denen die Aufgabe zu erledigen zugewiesen wurde
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'assignedTasks')]
+    private Collection $assignees;
 
     public function __construct()
     {
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
+        $this->assignees = new ArrayCollection();
     }
 
     /**
@@ -235,6 +250,54 @@ class Task implements JsonSerializable
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getOrganization(): ?Organization
+    {
+        return $this->organization;
+    }
+
+    public function setOrganization(?Organization $organization): static
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    public function isIsOrganisational(): ?bool
+    {
+        return $this->isOrganisational;
+    }
+
+    public function setIsOrganisational(bool $isOrganisational): static
+    {
+        $this->isOrganisational = $isOrganisational;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getAssignees(): Collection
+    {
+        return $this->assignees;
+    }
+
+    public function addAssignee(User $assignee): static
+    {
+        if (!$this->assignees->contains($assignee)) {
+            $this->assignees->add($assignee);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignee(User $assignee): static
+    {
+        $this->assignees->removeElement($assignee);
 
         return $this;
     }

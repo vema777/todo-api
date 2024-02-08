@@ -34,11 +34,15 @@ class Organization
     #[ORM\Column]
     private bool $isDeleted = false;
 
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Task::class)]
+    private Collection $tasks;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
+        $this->tasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -122,6 +126,36 @@ class Organization
     public function setIsDeleted(bool $isDeleted): static
     {
         $this->isDeleted = $isDeleted;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            // set the owning side to null (unless already changed)
+            if ($task->getOrganization() === $this) {
+                $task->setOrganization(null);
+            }
+        }
 
         return $this;
     }
