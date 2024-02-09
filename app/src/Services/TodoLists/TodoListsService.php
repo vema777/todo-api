@@ -41,7 +41,6 @@ interface TodoListsService
      * Ändert eine Liste anhand der Id.
      * @param int $id Die Id der Liste
      * @param Request $request Die geänderte Liste aus dem Frontend
-     * TODO: ask Pierre about the return type: should the changed list entity/object be returned or void?
      */
     public function editList(int $id, Request $request): void;
 

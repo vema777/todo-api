@@ -49,8 +49,8 @@ class Task implements JsonSerializable
     /**
      * @var User|null creator / author of the task
      */
-    #[ORM\ManyToOne(inversedBy: 'tasks')] // TODO default - null only if the user is in an organization
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
 
     /**
@@ -63,7 +63,7 @@ class Task implements JsonSerializable
      * @var bool|null ob die Aufgabe zu einer Organisation gehört oder nicht
      */
     #[ORM\Column]
-    private ?bool $isOrganisational = null;
+    private ?bool $isOrganizational = null;
 
     /**
      * @var Collection|ArrayCollection Nutzer, denen die Aufgabe zu erledigen zugewiesen wurde
@@ -76,6 +76,7 @@ class Task implements JsonSerializable
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
         $this->assignees = new ArrayCollection();
+        $this->isOrganizational = false; //Standardwert für erstellte Aufgaben ist false
     }
 
     /**
@@ -190,12 +191,13 @@ class Task implements JsonSerializable
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
-            'dateOfexpiry' => $this->dateOfExpiry,
+            'dateOfExpiry' => $this->dateOfExpiry,
             'priority' => $this->priority,
             'isDone' => $this->isDone,
             'createdAt' => $this->createdAt,
             'updatedAt' => $this->updatedAt,
-            'list' => $this->list
+            'list' => $this->list,
+            'isOrganizational' => $this->isOrganizational,
         ];
     }
 
@@ -265,14 +267,14 @@ class Task implements JsonSerializable
         return $this;
     }
 
-    public function isIsOrganisational(): ?bool
+    public function getIsOrganizational(): ?bool
     {
-        return $this->isOrganisational;
+        return $this->isOrganizational;
     }
 
-    public function setIsOrganisational(bool $isOrganisational): static
+    public function setIsOrganizational(bool $isOrganisational): static
     {
-        $this->isOrganisational = $isOrganisational;
+        $this->isOrganizational = $isOrganisational;
 
         return $this;
     }

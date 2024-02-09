@@ -97,8 +97,7 @@ class UserServiceImpl extends AbstractController implements UserService
         $data = json_decode($request->getContent(), true);
 
         $user = $this->getUserById($id);
-        // TODO: ask Pierre which properties need to be changed
-        // TODO: maybe implement logic to check for passed values and only change them?
+        // TODO: replace editUser() with editUserPassword(), editUserEmail(), editUserFirstName() etc.
         $user->setEmail($data['email']);
         $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
         $user->setFirstName($data['firstName']);

@@ -66,7 +66,6 @@ readonly class todoListsServiceImpl implements TodoListsService
         $this->entityManager->persist($todoList);
         $this->entityManager->flush();
 
-        // TODO: ask Pierre if the ID of the created list should be returned instead
         return $todoList;
     }
 
