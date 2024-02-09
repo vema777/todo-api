@@ -182,27 +182,6 @@ class Task implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'description' => $this->description,
-            'dateOfExpiry' => $this->dateOfExpiry,
-            'priority' => $this->priority,
-            'isDone' => $this->isDone,
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
-            'list' => $this->list,
-            'isOrganizational' => $this->isOrganizational,
-            'organization' => $this->organization,
-            'assignees' => $this->assignees,
-        ];
-    }
-
     public function getIsDone(): ?bool
     {
         return $this->isDone;
@@ -303,5 +282,26 @@ class Task implements JsonSerializable
         $this->assignees->removeElement($assignee);
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'dateOfExpiry' => $this->dateOfExpiry,
+            'priority' => $this->priority,
+            'isDone' => $this->isDone,
+            'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt,
+            'list' => $this->list,
+            'isOrganizational' => $this->isOrganizational,
+            'organization' => $this->organization,
+            'assignees' => $this->assignees,
+        ];
     }
 }

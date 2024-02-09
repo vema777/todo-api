@@ -48,8 +48,7 @@ class TodoListsController extends AbstractController
     {
         $this->todoListsService->editList($id, $request);
         return $this->json([
-            'message' => 'Liste wurde erfolgreich bearbeitet'
-        ], JsonResponse::HTTP_NO_CONTENT);
+            'message' => 'Liste wurde erfolgreich bearbeitet'], JsonResponse::HTTP_NO_CONTENT);
     }
 
     #[Route(path: '/{id}', methods: ['DELETE'])]
@@ -57,8 +56,6 @@ class TodoListsController extends AbstractController
     public function deleteTodoList(int $id): JsonResponse
     {
         $this->todoListsService->deleteList($id);
-        return $this->json([
-            'message' => 'Liste wurde erfolgreich gelöscht'
-        ], JsonResponse::HTTP_NO_CONTENT);
+        return $this->json(['message' => 'Liste wurde erfolgreich gelöscht'], JsonResponse::HTTP_NO_CONTENT);
     }
 }
