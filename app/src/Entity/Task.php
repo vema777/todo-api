@@ -192,7 +192,6 @@ class Task implements JsonSerializable
             'description' => $this->description,
             'dateOfexpiry' => $this->dateOfExpiry,
             'priority' => $this->priority,
-            'isDeleted' => $this->isDeleted,
             'isDone' => $this->isDone,
             'createdAt' => $this->createdAt,
             'updatedAt' => $this->updatedAt,

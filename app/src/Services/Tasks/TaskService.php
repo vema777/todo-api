@@ -19,6 +19,13 @@ interface TaskService
      */
     public function getTasksByLists(int $listId): array;
 
+    /**
+     * Methode um Aufgaben anhand der Benutzer-Id abzuholen.
+     * @param int $userId Die Id des Benutzers.
+     * @return array Die Liste von Aufgaben.
+     */
+    public function getTasksByUserId(int $userId): array;
+
     /** Löscht eine Aufgabe anhand der Id.
      * @param int $id Id einer Aufgabe.
      */

@@ -36,6 +36,21 @@ class TaskRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     *Query um Aufgaben anhand der UserId zu holen.
+     * @param int $id Die Id des Benutzers
+     * @return array Die Liste von Aufgaben
+     */
+    public function findTaskByUserId(int $id): array
+    {
+        return $this->createQueryBuilder('tasks')
+            ->andWhere('tasks.user = :val')
+            ->andWhere('tasks.isDeleted = false')
+            ->setParameter('val', $id)
+            ->getQuery()
+            ->getResult();
+    }
+
 
 //    /**
 //     * @return Task[] Returns an array of Task objects
