@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\TaskRepository;
 use DateTime;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
@@ -44,14 +46,37 @@ class Task implements JsonSerializable
     #[ORM\ManyToOne(targetEntity: TodoList::class,cascade:["persist"],  inversedBy: 'tasks')]
     private TodoList $list;
 
+    /**
+     * @var User|null creator / author of the task
+     */
     #[ORM\ManyToOne(inversedBy: 'tasks')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
+
+    /**
+     * @var Organization|null die Organisation, zu der diese Aufgabe gehört
+     */
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    private ?Organization $organization = null;
+
+    /**
+     * @var bool|null ob die Aufgabe zu einer Organisation gehört oder nicht
+     */
+    #[ORM\Column]
+    private ?bool $isOrganizational = null;
+
+    /**
+     * @var Collection|ArrayCollection Nutzer, denen die Aufgabe zu erledigen zugewiesen wurde
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'assignedTasks')]
+    private Collection $assignees;
 
     public function __construct()
     {
         $this->createdAt = new DateTime();
         $this->updatedAt = new DateTime();
+        $this->assignees = new ArrayCollection();
+        $this->isOrganizational = false; //Standardwert für erstellte Aufgaben ist false
     }
 
     /**
@@ -157,24 +182,6 @@ class Task implements JsonSerializable
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'description' => $this->description,
-            'dateOfexpiry' => $this->dateOfExpiry,
-            'priority' => $this->priority,
-            'isDone' => $this->isDone,
-            'createdAt' => $this->createdAt,
-            'updatedAt' => $this->updatedAt,
-            'list' => $this->list
-        ];
-    }
-
     public function getIsDone(): ?bool
     {
         return $this->isDone;
@@ -227,5 +234,74 @@ class Task implements JsonSerializable
         $this->user = $user;
 
         return $this;
+    }
+
+    public function getOrganization(): ?Organization
+    {
+        return $this->organization;
+    }
+
+    public function setOrganization(?Organization $organization): static
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    public function getIsOrganizational(): ?bool
+    {
+        return $this->isOrganizational;
+    }
+
+    public function setIsOrganizational(bool $isOrganisational): static
+    {
+        $this->isOrganizational = $isOrganisational;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getAssignees(): Collection
+    {
+        return $this->assignees;
+    }
+
+    public function addAssignee(User $assignee): static
+    {
+        if (!$this->assignees->contains($assignee)) {
+            $this->assignees->add($assignee);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignee(User $assignee): static
+    {
+        $this->assignees->removeElement($assignee);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'dateOfExpiry' => $this->dateOfExpiry,
+            'priority' => $this->priority,
+            'isDone' => $this->isDone,
+            'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt,
+            'list' => $this->list,
+            'isOrganizational' => $this->isOrganizational,
+            'organization' => $this->organization,
+            'assignees' => $this->assignees,
+        ];
     }
 }

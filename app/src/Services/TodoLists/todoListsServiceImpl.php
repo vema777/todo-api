@@ -25,12 +25,32 @@ readonly class todoListsServiceImpl implements TodoListsService
     /**
      * @inheritDoc
      */
-    public function getAllLists(): array
+    public function getTodoListById(int $id): TodoList
     {
-        $criteria = [
-            'isDeleted' => false
-        ];
-        return $this->todoListRepository->findBy($criteria);
+        $todoList = $this->todoListRepository->find($id);
+
+        if (!$todoList) {
+            throw new NotFoundHttpException("Die Liste mit der Id: " .
+                $id . " wurde nicht gefunden");
+        }
+
+        return $todoList;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllTodoLists(): array
+    {
+        return $this->todoListRepository->findBy(['isDeleted' => false]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTodoListsBy(array $criteria, array $orderBy = null, $limit = null, $offset = null): array
+    {
+        return $this->todoListRepository->findBy($criteria, $orderBy, $limit, $offset);
     }
 
     /**
@@ -38,45 +58,15 @@ readonly class todoListsServiceImpl implements TodoListsService
      */
     public function createTodoList(Request $request): TodoList
     {
-        $object = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent(), true);
+
         $todoList = new TodoList();
-        $todoList->setName($object['name']);
-        $this->entityManager->persist($todoList);
-        $this->entityManager->flush();
-        return $todoList;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getSingleTodoList(int $id): TodoList
-    {
-        $todoList = $this->todoListRepository->find($id);
-
-        if (!$todoList) {
-            throw new NotFoundHttpException("Die Liste mit der Id: " .
-                $id . " wurde nicht gefunden");
-        }
-
-        return $todoList;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function deleteList(int $id): void
-    {
-        $todoList = $this->todoListRepository->find($id);
-
-        if (!$todoList) {
-            throw new NotFoundHttpException("Die Liste mit der Id: " .
-                $id . " wurde nicht gefunden");
-        }
-
-        $todoList->setIsDeleted(true);
+        $todoList->setName($data['name']);
 
         $this->entityManager->persist($todoList);
         $this->entityManager->flush();
+
+        return $todoList;
     }
 
     /**
@@ -84,15 +74,23 @@ readonly class todoListsServiceImpl implements TodoListsService
      */
     public function editList(int $id, Request $request): void
     {
-        $todoList = $this->todoListRepository->find($id);
+        $data = json_decode($request->getContent(), true);
 
-        if (!$todoList) {
-            throw new NotFoundHttpException("Die Liste mit der Id: " .
-                $id . " wurde nicht gefunden");
-        }
+        $todoList = $this->getTodoListById($id);
+        $todoList->setName($data['name']);
 
-        $object = json_decode($request->getContent(), true);
-        $todoList->setName($object['name']);
+        $this->entityManager->persist($todoList);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteList(int $id): void
+    {
+        $todoList = $this->getTodoListById($id);
+
+        $todoList->setIsDeleted(true);
 
         $this->entityManager->persist($todoList);
         $this->entityManager->flush();

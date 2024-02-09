@@ -9,19 +9,24 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['main'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['main'])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(['main'])]
     private array $roles = [];
 
     /**
@@ -33,20 +38,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $plainPassword;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['main'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['main'])]
     private ?string $lastName = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['main'])]
     private \DateTimeInterface $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['main'])]
     private \DateTimeInterface $updatedAt;
 
     #[ORM\Column]
     private bool $isDeleted = false;
 
+    /**
+     * @var Collection|ArrayCollection vom Nutzer erstellte Aufgaben
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class)]
     private Collection $tasks;
 
@@ -56,12 +68,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /* Scopes given during API authentication */
     private ?array $accessTokenScopes = null;
 
+    /**
+     * @var Collection|ArrayCollection Organisationen, bei denen der Nutzer Mitglied ist
+     */
+    #[ORM\ManyToMany(targetEntity: Organization::class, inversedBy: 'users')]
+    private Collection $organization;
+
+    /**
+     * @var Collection|ArrayCollection Organisationen, bei denen der Nutzer der Eigentümer der Organisation ist
+     */
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Organization::class)]
+    private Collection $organizationsOwned;
+
+    /**
+     * @var Collection|ArrayCollection diesem Nutzer zugewiesene Aufgaben
+     */
+    #[ORM\ManyToMany(targetEntity: Task::class, mappedBy: 'assignees')]
+    private Collection $assignedTasks;
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
         $this->apiTokens = new ArrayCollection();
+        $this->organization = new ArrayCollection();
+        $this->organizationsOwned = new ArrayCollection();
+        $this->assignedTasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -279,5 +312,96 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function markAsTokenAuthenticated(array $scopes): void
     {
         $this->accessTokenScopes = $scopes;
+    }
+
+    /**
+     * @return Collection<int, Organization>
+     */
+    public function getOrganization(): Collection
+    {
+        return $this->organization;
+    }
+
+    public function addOrganization(Organization $organization): static
+    {
+        if (!$this->organization->contains($organization)) {
+            $this->organization->add($organization);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganization(Organization $organization): static
+    {
+        $this->organization->removeElement($organization);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Organization>
+     */
+    public function getOrganizationsOwned(): Collection
+    {
+        return $this->organizationsOwned;
+    }
+
+    public function addOrganizationsOwned(Organization $organizationsOwned): static
+    {
+        if (!$this->organizationsOwned->contains($organizationsOwned)) {
+            $this->organizationsOwned->add($organizationsOwned);
+            $organizationsOwned->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganizationsOwned(Organization $organizationsOwned): static
+    {
+        if ($this->organizationsOwned->removeElement($organizationsOwned)) {
+            // set the owning side to null (unless already changed)
+            if ($organizationsOwned->getOwner() === $this) {
+                $organizationsOwned->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getAssignedTasks(): Collection
+    {
+        return $this->assignedTasks;
+    }
+
+    public function addAssignedTask(Task $assignedTask): static
+    {
+        if (!$this->assignedTasks->contains($assignedTask)) {
+            $this->assignedTasks->add($assignedTask);
+            $assignedTask->addAssignee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTask(Task $assignedTask): static
+    {
+        if ($this->assignedTasks->removeElement($assignedTask)) {
+            $assignedTask->removeAssignee($this);
+        }
+
+        return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'email' => $this->email,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+        ];
     }
 }

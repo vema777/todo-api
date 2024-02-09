@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class UserServiceImpl extends AbstractController implements UserService
 {
@@ -20,6 +21,7 @@ class UserServiceImpl extends AbstractController implements UserService
         UserRepository              $userRepository,
         EntityManagerInterface      $entityManager,
         UserPasswordHasherInterface $passwordHasher,
+
     )
     {
         $this->userRepository = $userRepository;
@@ -48,8 +50,7 @@ class UserServiceImpl extends AbstractController implements UserService
      */
     public function getAllUsers(): array
     {
-        // TODO: change to findBy(['isDeleted' = false])?
-        return $this->userRepository->findAll();
+        return $this->userRepository->findBy(['isDeleted' => false]);
     }
 
     /**
@@ -74,6 +75,7 @@ class UserServiceImpl extends AbstractController implements UserService
         $user->setLastName($data['lastName']);
         $this->entityManager->persist($user);
 
+        // each user has one API token
         $apiToken = new ApiToken();
         $apiToken->setOwnedBy($user);
         $this->entityManager->persist($apiToken);
@@ -81,23 +83,74 @@ class UserServiceImpl extends AbstractController implements UserService
         $this->entityManager->flush();
 
         // for some reason $user->getValidTokenStrings() returns an empty array in this scope
-        // but if you login with the created user after creation, getValidTokenStrings() works as intended
+        // but if you log in with the created user after creation, getValidTokenStrings() works as intended
         return [
             'userId' => $user->getId(),
-            'apiToken' => $apiToken->getToken()
+            'apiToken' => $apiToken->getToken(),
         ];
     }
 
     /**
      * @inheritDoc
      */
-    public function deleteUser(int $id)
+    public function editUserEmail(Request $request, #[CurrentUser] ?User $user): void
     {
-        $user = $this->userRepository->find($id);
-        $user->setIsDeleted(true);
+        $data = json_decode($request->getContent(), true);
+
+        $user->setEmail($data['email']);
+
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-        // TODO: change return $id to something else...
-        return $id;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function editUserPassword(Request $request, #[CurrentUser] ?User $user): void
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function editUserFirstName(Request $request, #[CurrentUser] ?User $user): void
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $user->setFirstName($data['firstName']);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function editUserLastName(Request $request, #[CurrentUser] ?User $user): void
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $user->setLastName($data['lastName']);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleteUser(int $id): void
+    {
+        $user = $this->getUserById($id);
+        $user->setIsDeleted(true);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
     }
 }

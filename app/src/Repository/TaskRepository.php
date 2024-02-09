@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Task;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -22,33 +23,25 @@ class TaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * Querry um alle Tasks anhand der TodoListen zu holen.
-     * @param int $listId
-     * @return array
-     */
-    public function findTaskByTodoList(int $listId): array
-    {
-        return $this->createQueryBuilder('tasks')
-            ->andWhere('tasks.list = :val')
-            ->andWhere('tasks.isDeleted = false')
-            ->setParameter('val', $listId)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     *Query um Aufgaben anhand der UserId zu holen.
+     * Gibt alle Aufgaben zurück, die einem Nutzer zugewiesen sind oder vom Nutzer erstellt wurden.
      * @param int $id Die Id des Benutzers
      * @return array Die Liste von Aufgaben
+     * @throws Exception
      */
-    public function findTaskByUserId(int $id): array
+    public function findTasksByUserId(int $id): array
     {
-        return $this->createQueryBuilder('tasks')
-            ->andWhere('tasks.user = :val')
-            ->andWhere('tasks.isDeleted = false')
-            ->setParameter('val', $id)
-            ->getQuery()
-            ->getResult();
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT *
+            FROM task
+            WHERE task.user_id = :user_id
+            OR task.id = (SELECT task_id FROM task_user WHERE user_id = :user_id)
+        ';
+
+        $resultSet = $conn->executeQuery($sql, ['user_id' => $id]);
+
+        return $resultSet->fetchAllAssociative();
     }
 
 
