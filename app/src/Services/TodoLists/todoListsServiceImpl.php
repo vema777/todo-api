@@ -4,6 +4,7 @@ namespace App\Services\TodoLists;
 
 use App\Entity\TodoList;
 use App\Repository\TodoListRepository;
+use App\Services\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -11,15 +12,18 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 readonly class todoListsServiceImpl implements TodoListsService
 {
     private TodoListRepository $todoListRepository;
+    private UserService $userService;
     private EntityManagerInterface $entityManager;
 
     public function __construct(
         TodoListRepository     $todoListRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserService $userService
     )
     {
         $this->todoListRepository = $todoListRepository;
         $this->entityManager = $entityManager;
+        $this->userService = $userService;
     }
 
     /**
@@ -60,8 +64,11 @@ readonly class todoListsServiceImpl implements TodoListsService
     {
         $data = json_decode($request->getContent(), true);
 
+        $existingUser = $this->userService->getUserById($data['user']['id']);
+
         $todoList = new TodoList();
         $todoList->setName($data['name']);
+        $todoList->setUser($existingUser);
 
         $this->entityManager->persist($todoList);
         $this->entityManager->flush();

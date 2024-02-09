@@ -93,6 +93,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
+        $this->lists = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
         $this->apiTokens = new ArrayCollection();
@@ -407,5 +408,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
         ];
+    }
+
+    public function getLists(): Collection
+    {
+        return $this->lists;
+    }
+
+    public function setLists(Collection $lists): mixed
+    {
+        $this->lists = $lists;
+
+        return $this;
     }
 }
