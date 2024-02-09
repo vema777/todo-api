@@ -21,6 +21,15 @@ interface TodoListsService
     public function getAllTodoLists(): array;
 
     /**
+     * Holt die Liste von Aufgaben-liste aus der Datenbank anhand der
+     * Benutzer-Id ab.
+     *
+     * @param int $id Die Id des Benutzers.
+     * @return array Die Liste von Aufgaben-liste.
+     */
+    public function getTodoListsByUserId(int $id): array;
+
+    /**
      * Sucht nach Listen anhand der übergebenen Filtern.
      * @param array $criteria Suchfilter, z. B. ['isDeleted' => 'true']
      * @param array|null $orderBy Sortierparameter, z. B. ['updatedAt' => 'DESC']

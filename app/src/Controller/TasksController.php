@@ -28,7 +28,7 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
+    //#[IsGranted('ROLE_USER')]
     public function createNewTask(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
         $task = $this->taskService->createNewTask($request, $user);
@@ -41,7 +41,7 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '/organizational', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
+    //#[IsGranted('ROLE_USER')]
     public function createNewOrganizationalTask(Request $request): JsonResponse
     {
         $task = $this->taskService->createNewOrganizationalTask($request);

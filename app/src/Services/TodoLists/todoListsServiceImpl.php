@@ -95,4 +95,12 @@ readonly class todoListsServiceImpl implements TodoListsService
         $this->entityManager->persist($todoList);
         $this->entityManager->flush();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTodoListsByUserId(int $id): array
+    {
+        return $this->todoListRepository->findBy(['user' => $id, 'isDeleted' => false]);
+    }
 }

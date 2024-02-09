@@ -3,12 +3,12 @@
 namespace App\Services\Tasks;
 
 use App\Entity\Task;
-use App\Entity\TodoList;
 use App\Entity\User;
 use App\Repository\TaskRepository;
 use App\Services\TodoLists\TodoListsService;
 use App\Services\User\UserService;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,24 +19,27 @@ class TaskServiceImpl implements TaskService
 {
 
     private TaskRepository $taskRepository;
+
+    private UserService $userService;
+
+    private TodoListsService $todoListsService;
+
     private EntityManagerInterface $entityManager;
     private readonly OrganizationService $organizationService;
-    private readonly TodoListsService $todoListsService;
-    private readonly UserService $userService;
 
     public function __construct(
         TaskRepository         $taskRepository,
         EntityManagerInterface $entityManager,
-        OrganizationService    $organizationService,
-        TodoListsService       $todoListsService,
         UserService            $userService,
+        TodoListsService       $todoListsService,
+        OrganizationService    $organizationService,
     )
     {
         $this->taskRepository = $taskRepository;
         $this->entityManager = $entityManager;
-        $this->organizationService = $organizationService;
-        $this->todoListsService = $todoListsService;
         $this->userService = $userService;
+        $this->todoListsService = $todoListsService;
+        $this->organizationService = $organizationService;
     }
 
     /**
@@ -51,6 +54,7 @@ class TaskServiceImpl implements TaskService
         $task->setTitle($data['title']);
         $task->setDescription($data['description']);
         $task->setPriority($data['priority']);
+
         if (isset($data['dateOfExpiry'])) {
             $task->setDateOfExpiry(new \DateTimeImmutable($data['dateOfExpiry']));
         }
@@ -69,18 +73,34 @@ class TaskServiceImpl implements TaskService
      */
     public function createNewOrganizationalTask(Request $request): Task
     {
+        $object = json_decode($request->getContent(), true);
+
+
+        $existingUser = $this->userService->getUserById($object['user']['id']);
+        $exisitngList = $this->todoListsService->getTodoListById($object['list']['id']);
+
         $data = json_decode($request->getContent(), true);
 
         $organization = $this->organizationService->getOrganizationById($data['organizationId']);
         $todoList = $this->todoListsService->getTodoListById($data['list']['id']);
 
         $task = new Task();
+        $task->setTitle($object['title']);
+        $task->setUser($existingUser);
+        $task->setDescription($object['description']);
+        $task->setPriority($object['priority']);
+        $task->setList($exisitngList);
+        if (isset($object['dateOfExpiry'])) {
+            $task->setDateOfExpiry(new DateTime($object['dateOfExpiry']));
+        }
+
         $task->setOrganization($organization);
         $task->setTitle($data['title']);
         $task->setDescription($data['description']);
         $task->setPriority($data['priority']);
+
         if (isset($data['dateOfExpiry'])) {
-            $task->setDateOfExpiry(new \DateTimeImmutable($data['dateOfExpiry']));
+            $task->setDateOfExpiry(new DateTimeImmutable($data['dateOfExpiry']));
         }
         $task->setIsOrganizational(true);
         $task->setList($todoList);
@@ -121,20 +141,19 @@ class TaskServiceImpl implements TaskService
     public function editTask(int $id, Request $request): void
     {
         $task = $this->taskRepository->find($id);
+
         if (!$task) {
             throw new NotFoundHttpException("Die Aufgabe mit der Id: " .
-            $id . "wurde nicht gefunden");
+                $id . "wurde nicht gefunden");
         }
 
         $data = json_decode($request->getContent(), true);
+        $exisitngList = $this->todoListsService->getTodoListById($data['list']['id']);
 
-        $list = new TodoList();
-        $list->setName($data['list']['name']);
-        $list->setId($data['list']['id']);
-        $exisitngList = $this->entityManager->find(get_class($list), $list->getId());
         $task->setTitle($data['title']);
         $task->setDescription($data['description']);
         $task->setPriority($data['priority']);
+
         $task->setUpdatedAt(new DateTime());
 
         $task->setList($exisitngList);
