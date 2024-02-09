@@ -4,27 +4,21 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Services\Tasks\TaskService;
-use App\Services\User\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 #[Route(path: '/api/tasks')]
 class TasksController extends AbstractController
 {
     private readonly TaskService $taskService;
-    private readonly UserService $userService;
 
-    public function __construct(TaskService $taskService, UserService $userService)
+    public function __construct(TaskService $taskService)
     {
         $this->taskService = $taskService;
-        $this->userService = $userService;
     }
 
     /**
@@ -58,25 +52,6 @@ class TasksController extends AbstractController
     public function getTasksByListId(int $listId)
     {
         $tasks = $this->taskService->getTasksByListId($listId);
-
-        /*$serializer = new Serializer([new ObjectNormalizer()]);
-
-        return $serializer->normalize($tasks, 'json', [
-            AbstractNormalizer::ATTRIBUTES => [
-                'id',
-                'title',
-                'description',
-                'dateOfExpiry',
-                'priority',
-                'isDone',
-                'createdAt',
-                'updatedAt',
-                'list' => ['id'],
-                'isOrganizational',
-                'organization' => ['id'],
-            ]
-        ]);*/
-
 
         return $this->json($tasks, JsonResponse::HTTP_OK);
     }

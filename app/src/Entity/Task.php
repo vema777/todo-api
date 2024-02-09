@@ -198,6 +198,8 @@ class Task implements JsonSerializable
             'updatedAt' => $this->updatedAt,
             'list' => $this->list,
             'isOrganizational' => $this->isOrganizational,
+            'organization' => $this->organization,
+            'assignees' => $this->assignees,
         ];
     }
 
