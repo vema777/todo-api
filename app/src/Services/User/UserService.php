@@ -4,6 +4,7 @@ namespace App\Services\User;
 
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 interface UserService
 {
@@ -46,11 +47,36 @@ interface UserService
     public function createNewUser(Request $request): array;
 
     /**
-     * Ändert einen Nutzer anhand der Id.
-     * @param int $id Die Id des Nutzers
-     * @return void Der geänderte Nutzer aus dem Frontend
+     * Setzt eine neue E-Mail bei dem eingollgten Nutzer.
+     * @param Request $request POST-Request mit ['email' => 'myNewEmail@example.com']
+     * @param User|null $user
+     * @return void
      */
-    public function editUser(int $id, Request $request): void;
+    public function editUserEmail(Request $request, #[CurrentUser] ?User $user): void;
+
+    /**
+     * Setzt ein neues Passwort bei dem eingeloggten Nutzer.
+     * @param Request $request POST-Request mit ['password' => 'myNewPassword']
+     * @param User|null $user
+     * @return void
+     */
+    public function editUserPassword(Request $request, #[CurrentUser] ?User $user): void;
+
+    /**
+     * Setzt einen neuen Vornamen bei dem eingeloggten Nutzer.
+     * @param Request $request POST-Request mit ['firstName' => 'myNewFirstName']
+     * @param User|null $user
+     * @return void
+     */
+    public function editUserFirstName(Request $request, #[CurrentUser] ?User $user): void;
+
+    /**
+     * Setzt einen neuen Nachnamen bei dem eingeloggten Nutzer.
+     * @param Request $request POST-Request mit ['lastName' => 'myNewLastName']
+     * @param User|null $user
+     * @return void
+     */
+    public function editUserLastName(Request $request, #[CurrentUser] ?User $user): void;
 
     /**
      * Setzt die Eigenschaft isDeleted bei einem Nutzer auf true.
