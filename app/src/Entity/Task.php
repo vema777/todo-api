@@ -26,7 +26,7 @@ class Task implements JsonSerializable
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $dateOfExpiry = null;
+    private ?DateTimeImmutable $dateOfExpiry = null;
 
     #[ORM\Column]
     private DateTime $createdAt;
@@ -43,8 +43,9 @@ class Task implements JsonSerializable
     #[ORM\Column]
     private bool $isDone = false;
 
-    #[ORM\ManyToOne(targetEntity: TodoList::class,cascade:["persist"],  inversedBy: 'tasks')]
-    private TodoList $list;
+    #[ORM\ManyToOne(targetEntity: TodoList::class,  inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?TodoList $list = null;
 
     /**
      * @var User|null creator / author of the task
@@ -128,7 +129,7 @@ class Task implements JsonSerializable
     /**
      * @return \DateTimeImmutable|null
      */
-    public function getDateOfExpiry(): ?\DateTime
+    public function getDateOfExpiry(): ?DateTimeImmutable
     {
         return $this->dateOfExpiry;
     }
@@ -137,7 +138,7 @@ class Task implements JsonSerializable
      * @param \DateTimeImmutable $dateOfExpiry
      * @return $this
      */
-    public function setDateOfExpiry(\DateTime $dateOfExpiry): static
+    public function setDateOfExpiry(DateTimeImmutable $dateOfExpiry): static
     {
         $this->dateOfExpiry = $dateOfExpiry;
 
@@ -298,10 +299,17 @@ class Task implements JsonSerializable
             'isDone' => $this->isDone,
             'createdAt' => $this->createdAt,
             'updatedAt' => $this->updatedAt,
-            'list' => $this->list,
             'isOrganizational' => $this->isOrganizational,
             'organization' => $this->organization,
             'assignees' => $this->assignees,
+            'list' => $this->list
         ];
+    }
+
+    public function setId(?int $id): mixed
+    {
+        $this->id = $id;
+
+        return $this;
     }
 }

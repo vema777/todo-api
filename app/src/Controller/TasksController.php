@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[Route(path: '/api/tasks')]
 class TasksController extends AbstractController
@@ -28,7 +28,6 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '', methods: ['POST'])]
-    //#[IsGranted('ROLE_USER')]
     public function createNewTask(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
         $task = $this->taskService->createNewTask($request, $user);
@@ -41,7 +40,6 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '/organizational', methods: ['POST'])]
-    //#[IsGranted('ROLE_USER')]
     public function createNewOrganizationalTask(Request $request): JsonResponse
     {
         $task = $this->taskService->createNewOrganizationalTask($request);
@@ -65,8 +63,7 @@ class TasksController extends AbstractController
     public function getTasksByUserId(int $id): JsonResponse
     {
         $tasks = $this->taskService->getTasksByUserId($id);
-
-        return $this->json($tasks, JsonResponse::HTTP_OK);
+        return $this->json($tasks);
     }
 
     /**
@@ -78,8 +75,19 @@ class TasksController extends AbstractController
     public function getTasksByOrganisationId(int $id): JsonResponse
     {
         $tasks = $this->taskService->getTasksByOrganizationId($id);
-
         return $this->json($tasks, JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * Markiert eine Aufgabe als Erledigt oder nicht erledigt
+     * @param int $id Die Id der Aufgabe
+     * @return JsonResponse Der Antwort als Json
+     */
+    #[Route(path: '/status/{id}', methods: ['PUT'])]
+    public function markTaskAsDoneOrUndone(int $id)
+    {
+        $this->taskService->markTaskAsDoneOrUndone($id);
+        return $this->json(['message' => 'Status wurde erfolgreich geändert'], JsonResponse::HTTP_NO_CONTENT);
     }
 
     #[Route(path: '/{id}', methods: ['PUT'])]

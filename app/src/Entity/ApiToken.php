@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 class ApiToken
 {
     private const PERSONAL_ACCESS_TOKEN_PREFIX = 'tcp_';
-
     public const SCOPE_USER_EDIT = 'ROLE_USER_EDIT';
     public const SCOPE_TASK_CREATE = 'ROLE_TASK_CREATE';
     public const SCOPE_TASK_EDIT = 'ROLE_TASK_EDIT';

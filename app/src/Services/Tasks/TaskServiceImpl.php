@@ -9,6 +9,7 @@ use App\Services\TodoLists\TodoListsService;
 use App\Services\User\UserService;
 use DateTime;
 use DateTimeImmutable;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -45,18 +46,20 @@ class TaskServiceImpl implements TaskService
     /**
      * @inheritDoc
      */
-    public function createNewTask(Request $request, #[CurrentUser] ?User $user): Task
+    public function createNewTask(Request $request  ): Task
     {
         $data = json_decode($request->getContent(), true);
 
         $task = new Task();
         $todoList = $this->todoListsService->getTodoListById($data['list']['id']);
+        $user = $this->userService->getUserById($data['user']['id']);
+
         $task->setTitle($data['title']);
         $task->setDescription($data['description']);
         $task->setPriority($data['priority']);
 
         if (isset($data['dateOfExpiry'])) {
-            $task->setDateOfExpiry(new \DateTimeImmutable($data['dateOfExpiry']));
+            $task->setDateOfExpiry(new DateTimeImmutable($data['dateOfExpiry']));
         }
         $task->setIsOrganizational(false);
         $task->setList($todoList);
@@ -91,7 +94,7 @@ class TaskServiceImpl implements TaskService
         $task->setPriority($object['priority']);
         $task->setList($exisitngList);
         if (isset($object['dateOfExpiry'])) {
-            $task->setDateOfExpiry(new DateTime($object['dateOfExpiry']));
+            $task->setDateOfExpiry(new DateTimeImmutable($object['dateOfExpiry']));
         }
 
         $task->setOrganization($organization);
@@ -121,10 +124,16 @@ class TaskServiceImpl implements TaskService
 
     /**
      * @inheritDoc
+     * @throws Exception
      */
     public function getTasksByUserId(int $userId): array
     {
-        return $this->taskRepository->findTasksByUserId($userId);
+        $taskArr = [];
+        $resultArr = $this->taskRepository->findTasksByUserId($userId);
+        foreach ($resultArr as $result){
+            $taskArr[] = $this->toTask($result);
+        }
+        return $taskArr;
     }
 
     /**
@@ -153,6 +162,10 @@ class TaskServiceImpl implements TaskService
         $task->setTitle($data['title']);
         $task->setDescription($data['description']);
         $task->setPriority($data['priority']);
+
+        if (isset($data['dateOfExpiry'])) {
+            $task->setDateOfExpiry(new DateTimeImmutable($data['dateOfExpiry']));
+        }
 
         $task->setUpdatedAt(new DateTime());
 
@@ -215,4 +228,47 @@ class TaskServiceImpl implements TaskService
         $this->entityManager->persist($task);
         $this->entityManager->flush();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function markTaskAsDoneOrUndone(int $id): void
+    {
+        $task = $this->taskRepository->find($id);
+
+        if (!$task) {
+            throw new NotFoundHttpException("Die Aufgabe mit der Id: " .
+                $id . " wurde nicht gefunden");
+        }
+
+        $task->setIsDone(!$task->getIsDone());
+
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
+    }
+
+    private function toTask($resultArr): Task {
+        $task = new Task();
+        $task->setTitle($resultArr['title']);
+        $task->setId($resultArr['id']);
+        $task->setDescription($resultArr['description']);
+
+        if(isset($resultArr['date_of_expiry'])){
+            $task->setDateOfExpiry(new DateTimeImmutable($resultArr['date_of_expiry']));
+        }
+
+        if(isset($resultArr['organisation_id'])){
+            $organization = $this->organizationService->getOrganizationById($resultArr['organisation_id']);
+            $task->setOrganization($organization);
+        }
+
+        if(isset($resultArr['list_id'])){
+            $list = $this->todoListsService->getTodoListById($resultArr['list_id']);
+            $task->setList($list);
+        }
+
+        return $task;
+    }
+
+
 }

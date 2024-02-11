@@ -35,8 +35,8 @@ class TaskRepository extends ServiceEntityRepository
         $sql = '
             SELECT *
             FROM task
-            WHERE task.user_id = :user_id
-            OR task.id = (SELECT task_id FROM task_user WHERE user_id = :user_id)
+            WHERE task.user_id = :user_id AND task.is_deleted = false
+            OR task.id = (SELECT task_id FROM task_user WHERE user_id = :user_id) AND task.is_deleted = false
         ';
 
         $resultSet = $conn->executeQuery($sql, ['user_id' => $id]);
