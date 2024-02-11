@@ -57,6 +57,7 @@ class UsersController extends AbstractController
         description: 'Nicht zugelassen',
     )]
     #[OA\Tag(name: 'users')]
+    #[IsGranted('ROLE_USER')]
     #[Route('', methods: ['GET'])]
     public function getAllUsers(): JsonResponse
     {
@@ -158,6 +159,7 @@ class UsersController extends AbstractController
         description: 'Nicht zugelassen',
     )]
     #[OA\Tag(name: 'users')]
+    #[IsGranted('ROLE_USER')]
     #[Route('/changeemail', methods: ['PUT'])]
     public function changeUserEmail(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
@@ -200,6 +202,7 @@ class UsersController extends AbstractController
         description: 'Nicht zugelassen',
     )]
     #[OA\Tag(name: 'users')]
+    #[IsGranted('ROLE_USER')]
     #[Route('/changepassword', methods: ['PUT'])]
     public function changeUserPassword(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
@@ -242,6 +245,7 @@ class UsersController extends AbstractController
         description: 'Nicht zugelassen',
     )]
     #[OA\Tag(name: 'users')]
+    #[IsGranted('ROLE_USER')]
     #[Route('/changefirstname', methods: ['PUT'])]
     public function changeUserFirstName(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
@@ -284,6 +288,7 @@ class UsersController extends AbstractController
         description: 'Nicht zugelassen',
     )]
     #[OA\Tag(name: 'users')]
+    #[IsGranted('ROLE_USER')]
     #[Route('/changelastname', methods: ['PUT'])]
     public function changeUserLastName(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
