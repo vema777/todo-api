@@ -10,44 +10,68 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use OpenApi\Attributes as OA;
 
 #[Route('/api/organizations')]
 class OrganizationsController extends AbstractController
 {
     private readonly OrganizationService $organizationService;
-    private NormalizerInterface $normalizer;
 
     public function __construct(
         OrganizationService $organizationService,
-        NormalizerInterface $normalizer,
     )
     {
         $this->organizationService = $organizationService;
-        $this->normalizer = $normalizer;
     }
 
+    /**
+     * Liefert die Liste von Organisationen, die zu einem Benutzer gehören
+     */
+    #[OA\Response(
+        response: 200,
+        description: 'Die Liste von Organisationen',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'organisationen')]
     #[Route(path: '', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function getOrganizationsForCurrentUser(#[CurrentUser] ?User $user): JsonResponse
     {
-        $organizations = $this->organizationService->getOrganizationsBy([
-            'isDeleted' => false,
-            'owner' => $user
-        ]);
-        return $this->json(
-            $this->normalizer->normalize($organizations, 'json', [
-                AbstractNormalizer::ATTRIBUTES => [
-                    'id',
-                    'name',
-                    'createdAt',
-                    'updatedAt',
-                ]
-            ])
-        );
+        $organizations = $this->organizationService->getOrganizationsForCurrentUser($user);
+        return $this->json($organizations);
     }
 
+    /**
+     * Erstellt eine Organisation
+     */
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'name',
+                            type: 'string'
+                        )
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Die Organisation wurde erstellt',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'organisationen')]
     #[Route(path: '', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function createOrganization(Request $request, #[CurrentUser] ?User $user): JsonResponse
@@ -56,6 +80,18 @@ class OrganizationsController extends AbstractController
         return $this->json($organization, JsonResponse::HTTP_CREATED);
     }
 
+    /**
+     * Liefert eine Organisation anhand der Id zurück.
+     */
+    #[OA\Response(
+        response: 200,
+        description: 'Eine Organisation',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'organisationen')]
     #[Route(path: '/{id}', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function getOrganization(int $id): JsonResponse
@@ -64,6 +100,18 @@ class OrganizationsController extends AbstractController
         return $this->json($organization);
     }
 
+    /**
+     * Logisch löscht eine Organisation(setzt isDeleted auf true)
+     */
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'organisationen')]
     #[Route(path: '/{id}', methods: ['DELETE'])]
     #[IsGranted('ROLE_ORGANIZATION_OWNER')]
     public function deleteOrganization(int $id): JsonResponse
@@ -72,6 +120,34 @@ class OrganizationsController extends AbstractController
         return $this->json(['message' => 'Organisation wurde erfolgreich gelöscht'], JsonResponse::HTTP_NO_CONTENT);
     }
 
+    /**
+     * Ändert eine Organisation
+     */
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'name',
+                            type: 'string'
+                        )
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'organisationen')]
     #[Route(path: '/{id}', methods: ['PUT'])]
     #[IsGranted('ROLE_ORGANIZATION_OWNER')]
     public function editOrganization(int $id, Request $request): JsonResponse
@@ -80,7 +156,19 @@ class OrganizationsController extends AbstractController
         return $this->json(['message' => 'Organisation wurde erfolgreich bearbeitet'], JsonResponse::HTTP_NO_CONTENT);
     }
 
-    #[Route(path: '/{organizationId}/{userId}', methods: ['POST'])]
+    /**
+     * Einen Benutzer zur Organisation hinzufügen
+     */
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'organisationen')]
+    #[Route(path: '/{organizationId}/{userId}', methods: ['PUT'])]
     #[IsGranted('ROLE_ORGANIZATION_OWNER', 'ROLE_ORGANIZATION_ADMIN')]
     public function addUserToOrganization(int $organizationId, int $userId): JsonResponse
     {
@@ -90,6 +178,18 @@ class OrganizationsController extends AbstractController
         ], JsonResponse::HTTP_NO_CONTENT);
     }
 
+    /**
+     * Löscht ein Nutzer aus eine Organisation
+     */
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'organisationen')]
     #[Route(path: '/{organizationId}/{userId}', methods: ['DELETE'])]
     #[IsGranted('ROLE_ORGANIZATION_OWNER', 'ROLE_ORGANIZATION_ADMIN')]
     public function removeUserFromOrganization(int $organizationId, int $userId): JsonResponse

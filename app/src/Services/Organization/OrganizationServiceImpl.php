@@ -51,15 +51,21 @@ class OrganizationServiceImpl implements OrganizationService
         return $this->organizationRepository->findBy(['isDeleted' => false]);
     }
 
-    public function getOrganizationsBy(array $criteria = ['isDeleted' => false], array $orderBy = null, $limit = null, $offset = null): array
+    /**
+     * @inheritDoc
+     */
+    public function getOrganizationsForCurrentUser(?User $user): array
     {
-        return $this->organizationRepository->findBy($criteria);
+        return $this->organizationRepository->findBy([
+            'isDeleted' => false,
+            'owner' => $user
+        ]);
     }
 
     /**
      * @inheritDoc
      */
-    public function createOrganization(Request $request, #[CurrentUser] ?User $user): int
+    public function createOrganization(Request $request, #[CurrentUser] ?User $user):Organization
     {
         $data = json_decode($request->getContent(), true);
 
@@ -70,7 +76,7 @@ class OrganizationServiceImpl implements OrganizationService
         $this->entityManager->persist($organization);
         $this->entityManager->flush();
 
-        return $organization->getId();
+        return $organization;
     }
 
     /**

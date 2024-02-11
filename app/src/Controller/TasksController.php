@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Task;
 use App\Entity\User;
 use App\Services\Tasks\TaskService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,7 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+
+
+use OpenApi\Attributes as OA;
 
 #[Route(path: '/api/tasks')]
 class TasksController extends AbstractController
@@ -22,13 +25,81 @@ class TasksController extends AbstractController
         $this->taskService = $taskService;
     }
 
+
     /**
-     * Erstellt eine Aufgabe, die einem Nutzer gehört und keiner Organisation
-     * @param Request $request
-     * @param User|null $user aktuell eingolggter Nutzer
-     * @return JsonResponse
+     * Erstellt eine Aufgabe für einen Benutzer.
      */
     #[Route(path: '', methods: ['POST'])]
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'title',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'description',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'priority',
+                            type: 'int'
+                        ),
+                        new OA\Property(
+                            property: 'dateOfExpiry',
+                            type: 'datetime'
+                        ),
+                        new OA\Property(
+                            property: 'list',
+                            properties: [
+                                new OA\Property(
+                                    property: 'id',
+                                    type: 'int'
+                                ),
+                                new OA\Property(
+                                    property: 'name',
+                                    type: 'string'
+                                ),
+                            ],
+                            type: 'object'
+                        )
+                        ,
+                        new OA\Property(
+                            property: 'user',
+                            properties: [
+                                new OA\Property(
+                                    property: 'id',
+                                    type: 'int'
+                                ),
+                                new OA\Property(
+                                    property: 'firstName',
+                                    type: 'string'
+                                ),
+                                new OA\Property(
+                                    property: 'lastName',
+                                    type: 'string'
+                                ),
+                            ],
+                            type: 'object'
+                        )
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Die Aufgabe wurde erstellt',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[IsGranted('ROLE_USER')]
     public function createNewTask(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
@@ -37,11 +108,60 @@ class TasksController extends AbstractController
     }
 
     /**
-     * Erstellt eine Aufgabe, die einer Organisation gehört
-     * @param Request $request organisationId
-     * @return JsonResponse
+     * Erstellt eine Aufgabe, die zu einer Organisation gehört
      */
     #[Route(path: '/organizational', methods: ['POST'])]
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'title',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'description',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'priority',
+                            type: 'int'
+                        ),
+                        new OA\Property(
+                            property: 'dateOfExpiry',
+                            type: 'datetime'
+                        ),
+                        new OA\Property(
+                            property: 'organisation',
+                            properties: [
+                                new OA\Property(
+                                    property: 'id',
+                                    type: 'int'
+                                ),
+                                new OA\Property(
+                                    property: 'name',
+                                    type: 'string'
+                                )
+                            ],
+                            type: 'object'
+                        )
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Die Aufgabe wurde erstellt',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[IsGranted('ROLE_USER')]
     public function createNewOrganizationalTask(Request $request): JsonResponse
     {
@@ -49,7 +169,25 @@ class TasksController extends AbstractController
         return $this->json($task, JsonResponse::HTTP_CREATED);
     }
 
-    #[Route(path: '/lists/{listId}', methods: ['GET'])]
+    /**
+     * Liefert eine Liste von Aufgaben zurück, die zu einer Liste gehören.
+     */
+    #[Route('/lists/{listId}', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Die Liste von Aufgaben',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Parameter(
+        name: 'listId',
+        description: 'Die Id der Liste',
+        in: 'path',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[IsGranted('ROLE_USER')]
     public function getTasksByListId(int $listId)
     {
@@ -59,11 +197,24 @@ class TasksController extends AbstractController
     }
 
     /**
-     * Gibt Aufgaben zurück, die vom Nutzer erstellt wurden und die Aufgaben, die diesem Nutzer zugewiesen sind.
-     * @param int $id User Id
-     * @return JsonResponse
+     * Liefert eine Liste von Aufgaben zurück, die zu einem Benutzer gehören.
      */
     #[Route(path: '/users/{id}', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Die Liste von Aufgaben',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        description: 'Die Id des Benutzers',
+        in: 'path',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[IsGranted('ROLE_USER')]
     public function getTasksByUserId(int $id): JsonResponse
     {
@@ -72,11 +223,25 @@ class TasksController extends AbstractController
     }
 
     /**
-     * Gibt Aufgaben zurück, die einer ausgewählten Organisation gehören.
-     * @param int $id Organization Id
-     * @return JsonResponse
+     * Liefert Aufgaben  zurück, die zu  einer Organisation gehören.
+     *
      */
     #[Route(path: '/organizations/{id}', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Die Liste von Aufgaben',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        description: 'Die Id der Organisation',
+        in: 'path',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[IsGranted('ROLE_USER')]
     public function getTasksByOrganisationId(int $id): JsonResponse
     {
@@ -86,9 +251,16 @@ class TasksController extends AbstractController
 
     /**
      * Markiert eine Aufgabe als Erledigt oder nicht erledigt
-     * @param int $id Die Id der Aufgabe
-     * @return JsonResponse Der Antwort als Json
      */
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[Route(path: '/status/{id}', methods: ['PUT'])]
     #[IsGranted('ROLE_USER')]
     public function markTaskAsDoneOrUndone(int $id)
@@ -97,6 +269,79 @@ class TasksController extends AbstractController
         return $this->json(['message' => 'Status wurde erfolgreich geändert'], JsonResponse::HTTP_NO_CONTENT);
     }
 
+    /**
+     * Ändert eine Aufgabe
+     */
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'title',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'description',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'priority',
+                            type: 'int'
+                        ),
+                        new OA\Property(
+                            property: 'dateOfExpiry',
+                            type: 'datetime'
+                        ),
+                        new OA\Property(
+                            property: 'list',
+                            properties: [
+                                new OA\Property(
+                                    property: 'id',
+                                    type: 'int'
+                                ),
+                                new OA\Property(
+                                    property: 'name',
+                                    type: 'string'
+                                ),
+                            ],
+                            type: 'object'
+                        )
+                        ,
+                        new OA\Property(
+                            property: 'user',
+                            properties: [
+                                new OA\Property(
+                                    property: 'id',
+                                    type: 'int'
+                                ),
+                                new OA\Property(
+                                    property: 'firstName',
+                                    type: 'string'
+                                ),
+                                new OA\Property(
+                                    property: 'lastName',
+                                    type: 'string'
+                                ),
+                            ],
+                            type: 'object'
+                        )
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[Route(path: '/{id}', methods: ['PUT'])]
     #[IsGranted('ROLE_USER')]
     public function editTask(int $id, Request $request)
@@ -105,6 +350,18 @@ class TasksController extends AbstractController
         return $this->json(['message' => 'Aufgabe wurde erfolgreich bearbeitet'], JsonResponse::HTTP_NO_CONTENT);
     }
 
+    /**
+     * logisch löscht eine Aufgabe(Setzt isDeleted auf true)
+     */
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[Route(path: '/{id}', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]
     public function deleteTask(int $id)
@@ -115,11 +372,17 @@ class TasksController extends AbstractController
 
     /**
      * Weist einem Nutzer eine Aufgabe zu
-     * @param int $id Task Id
-     * @param int $userId
-     * @return JsonResponse
      */
-    #[Route(path: '/{id}/assignees/{userId}', methods: ['POST'])]
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'tasks')]
+    #[Route(path: '/{id}/assignees/{userId}', methods: ['PUT'])]
     #[IsGranted('ROLE_ORGANIZATION_OWNER')]
     public function addAssignee(int $id, int $userId): JsonResponse
     {
@@ -130,10 +393,17 @@ class TasksController extends AbstractController
     }
 
     /**
-     * @param int $id Task Id
-     * @param int $userId
-     * @return JsonResponse
+     * Einen Benutzer aus einer Aufgabe entfernen
      */
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'tasks')]
     #[Route(path: '/{id}/assignees/{userId}', methods: ['DELETE'])]
     #[IsGranted('ROLE_ORGANIZATION_OWNER')]
     public function removeAssignee(int $id, int $userId): JsonResponse
