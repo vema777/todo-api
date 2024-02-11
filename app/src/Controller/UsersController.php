@@ -68,6 +68,26 @@ class UsersController extends AbstractController
     /**
      * Gibt User Id und Api Token zurück, wenn richtige E-Mail und Passwort übergeben wurden.
      */
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'password',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'email',
+                            type: 'string'
+                        )
+                    ]
+                )
+            )
+        ]
+    )]
     #[OA\Response(
         response: 200,
         description: 'ein Objekt aus userId und ApiToken',
