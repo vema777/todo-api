@@ -11,7 +11,7 @@ interface OrganizationService
 {
     /**
      * @param int $id Die Id der Organisation
-     * @return Organization
+     * @return Organization Die erstellte Organisation
      */
     public function getOrganizationById(int $id): Organization;
 
@@ -20,42 +20,44 @@ interface OrganizationService
      */
     public function getAllOrganizations(): array;
 
-    public function getOrganizationsBy(array $criteria, array $orderBy = null, $limit = null, $offset = null): array;
-
     /**
-     * @param Request $request
-     * @param User|null $user
-     * @return int
+     * Filtert Organisationen für ein Benutzer
+     * @param User|null $user Der angemeldete Benutzer
+     * @return array Die Liste von Organisationen
      */
-    public function createOrganization(Request $request, #[CurrentUser] ?User $user): int;
+    public function getOrganizationsForCurrentUser(?User $user): array;
 
     /**
-     * Endpoint zum Ändern des Namens der Organisation
+     * Erstellt eine Organisation für ein Benutzer
+     * @param Request $request Die Informationen der Organisation
+     * @param User|null $user Der angemeldete Benutzer
+     */
+    public function createOrganization(Request $request, #[CurrentUser] ?User $user):Organization;
+
+    /**
+     *  Ändert der Name der Organisation
      * @param int $id Die Id der Organisation
      * @param Request $request
-     * @return void
      */
     public function editOrganization(int $id, Request $request): void;
 
     /**
+     * Logisch löscht eine Organisation
      * @param int $id Die Id der Organisation
-     * @return void
      */
     public function deleteOrganization(int $id): void;
 
     /**
      * Fügt einen Nutzer zu einer Organisation hinzu
-     * @param int $organizationId
-     * @param int $userId
-     * @return void
+     * @param int $organizationId Die Id der Organisation
+     * @param int $userId Die Id des angemeldeten Benutzers
      */
     public function addUserToOrganization(int $organizationId, int $userId): void;
 
     /**
      * Entfernt einen Nutzer aus einer Organisation
-     * @param int $organizationId
-     * @param int $userId
-     * @return void
+     * @param int $organizationId Die Id der Organisation
+     * @param int $userId die Id des angemeldeten Benutzers
      */
     public function removeUserFromOrganization(int $organizationId, int $userId): void;
 }

@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use OpenApi\Attributes as OA;
 
 #[Route(path: '/api/users')]
 class UsersController extends AbstractController
@@ -25,9 +27,17 @@ class UsersController extends AbstractController
 
     /**
      * Gibt den gefundenen Nutzer als ein JSON Objekt zurück.
-     * @param int $id User Id
-     * @return JsonResponse
      */
+    #[OA\Response(
+        response: 200,
+        description: 'Ein Benutzer als Json',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'users')]
+    #[IsGranted('ROLE_USER')]
     #[Route('/{id}', methods: ['GET'])]
     public function getUserById(int $id): JsonResponse
     {
@@ -37,8 +47,16 @@ class UsersController extends AbstractController
 
     /**
      * Gibt ein JSON-Array mit allen nicht gelöschten Nutzern zurück.
-     * @return JsonResponse
      */
+    #[OA\Response(
+        response: 200,
+        description: 'Ein Liste von Benutzern als Json',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'users')]
     #[Route('', methods: ['GET'])]
     public function getAllUsers(): JsonResponse
     {
@@ -48,9 +66,16 @@ class UsersController extends AbstractController
 
     /**
      * Gibt User Id und Api Token zurück, wenn richtige E-Mail und Passwort übergeben wurden.
-     * @param User|null $user
-     * @return JsonResponse
      */
+    #[OA\Response(
+        response: 200,
+        description: 'ein Objekt aus userId und ApiToken',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'users')]
     #[Route('/login', name: 'api_login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
@@ -60,9 +85,44 @@ class UsersController extends AbstractController
 
     /**
      * Erstellt einen neuen Nutzer.
-     * @param Request $request POST-Request mit Parametern email, password, firstName, lastName
-     * @return JsonResponse
      */
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'firstName',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'lastName',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'password',
+                            type: 'string'
+                        ),
+                        new OA\Property(
+                            property: 'email',
+                            type: 'string'
+                        )
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Ein Benutzer wurde erstellt',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'users')]
     #[Route('/logup', methods: ['POST'])]
     public function createNewUser(Request $request): JsonResponse
     {
@@ -71,12 +131,34 @@ class UsersController extends AbstractController
     }
 
     /**
-     * Setzt ein neues Passwort bei dem eingeloggten Nutzer.
-     * @param Request $request POST-Request mit ['password' => 'myNewPassword']
-     * @param User|null $user
-     * @return JsonResponse
+     * Setzt eine neue E-mail bei dem eingeloggten Nutzer.
      */
-    #[Route('/changeemail', methods: ['POST'])]
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'email',
+                            type: 'string'
+                        )
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'users')]
+    #[Route('/changeemail', methods: ['PUT'])]
     public function changeUserEmail(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
         if ($user === null) {
@@ -92,11 +174,33 @@ class UsersController extends AbstractController
 
     /**
      * Setzt ein neues Passwort bei dem eingeloggten Nutzer.
-     * @param Request $request POST-Request mit ['firstName' => 'myNewFirstName']
-     * @param User|null $user
-     * @return JsonResponse
      */
-    #[Route('/changepassword', methods: ['POST'])]
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'password',
+                            type: 'string'
+                        ),
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'users')]
+    #[Route('/changepassword', methods: ['PUT'])]
     public function changeUserPassword(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
         if ($user === null) {
@@ -112,11 +216,33 @@ class UsersController extends AbstractController
 
     /**
      * Setzt einen neuen Vornamen bei dem eingeloggten Nutzer.
-     * @param Request $request POST-Request mit ['firstName' => 'myNewFirstName']
-     * @param User|null $user
-     * @return JsonResponse
      */
-    #[Route('/changefirstname', methods: ['POST'])]
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'firstName',
+                            type: 'string'
+                        ),
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'users')]
+    #[Route('/changefirstname', methods: ['PUT'])]
     public function changeUserFirstName(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
         if ($user === null) {
@@ -132,11 +258,33 @@ class UsersController extends AbstractController
 
     /**
      * Setzt einen neuen Nachnamen bei dem eingeloggten Nutzer.
-     * @param Request $request POST-Request mit ['lastName' => 'myNewLastName']
-     * @param User|null $user
-     * @return JsonResponse
      */
-    #[Route('/changelastname', methods: ['POST'])]
+    #[OA\RequestBody(
+        required: true,
+        content: [
+            new OA\MediaType(
+                mediaType: 'application/json',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(
+                            property: 'lastName',
+                            type: 'string'
+                        ),
+                    ]
+                )
+            )
+        ]
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'No Content',
+    )]
+    #[OA\Response(
+        response: 401,
+        description: 'Nicht zugelassen',
+    )]
+    #[OA\Tag(name: 'users')]
+    #[Route('/changelastname', methods: ['PUT'])]
     public function changeUserLastName(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
         if ($user === null) {
