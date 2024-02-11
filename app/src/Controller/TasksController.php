@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[Route(path: '/api/tasks')]
@@ -28,6 +29,7 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function createNewTask(Request $request, #[CurrentUser] ?User $user): JsonResponse
     {
         $task = $this->taskService->createNewTask($request, $user);
@@ -40,6 +42,7 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '/organizational', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function createNewOrganizationalTask(Request $request): JsonResponse
     {
         $task = $this->taskService->createNewOrganizationalTask($request);
@@ -47,6 +50,7 @@ class TasksController extends AbstractController
     }
 
     #[Route(path: '/lists/{listId}', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getTasksByListId(int $listId)
     {
         $tasks = $this->taskService->getTasksByListId($listId);
@@ -60,6 +64,7 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '/users/{id}', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getTasksByUserId(int $id): JsonResponse
     {
         $tasks = $this->taskService->getTasksByUserId($id);
@@ -72,6 +77,7 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '/organizations/{id}', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function getTasksByOrganisationId(int $id): JsonResponse
     {
         $tasks = $this->taskService->getTasksByOrganizationId($id);
@@ -84,6 +90,7 @@ class TasksController extends AbstractController
      * @return JsonResponse Der Antwort als Json
      */
     #[Route(path: '/status/{id}', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER')]
     public function markTaskAsDoneOrUndone(int $id)
     {
         $this->taskService->markTaskAsDoneOrUndone($id);
@@ -91,6 +98,7 @@ class TasksController extends AbstractController
     }
 
     #[Route(path: '/{id}', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER')]
     public function editTask(int $id, Request $request)
     {
         $this->taskService->editTask($id, $request);
@@ -98,6 +106,7 @@ class TasksController extends AbstractController
     }
 
     #[Route(path: '/{id}', methods: ['DELETE'])]
+    #[IsGranted('ROLE_USER')]
     public function deleteTask(int $id)
     {
         $this->taskService->deleteTask($id);
@@ -111,6 +120,7 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '/{id}/assignees/{userId}', methods: ['POST'])]
+    #[IsGranted('ROLE_ORGANIZATION_OWNER')]
     public function addAssignee(int $id, int $userId): JsonResponse
     {
         $this->taskService->addAssignee($id, $userId);
@@ -125,6 +135,7 @@ class TasksController extends AbstractController
      * @return JsonResponse
      */
     #[Route(path: '/{id}/assignees/{userId}', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ORGANIZATION_OWNER')]
     public function removeAssignee(int $id, int $userId): JsonResponse
     {
         $this->taskService->removeAssignee($id, $userId);
