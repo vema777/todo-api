@@ -17,7 +17,7 @@ class UsersController extends AbstractController
     private readonly UserService $userService;
 
     public function __construct(
-        UserService         $userService,
+        UserService $userService,
     )
     {
         $this->userService = $userService;
@@ -54,16 +54,8 @@ class UsersController extends AbstractController
     #[Route('/login', name: 'api_login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
-        if ($user === null) {
-            return $this->json([
-                'message' => 'Invalid login request: check that the Content-Type header is "application/json"',
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        return $this->json([
-            'userId' => $user->getId(),
-            'apiToken' => $user->getValidTokenStrings()[0]
-        ], JsonResponse::HTTP_OK);
+        $userApiToken = $this->userService->login($user);
+        return $this->json($userApiToken, JsonResponse::HTTP_OK);
     }
 
     /**
@@ -75,7 +67,6 @@ class UsersController extends AbstractController
     public function createNewUser(Request $request): JsonResponse
     {
         $UserIdAndToken = $this->userService->createNewUser($request);
-
         return $this->json($UserIdAndToken, JsonResponse::HTTP_CREATED);
     }
 

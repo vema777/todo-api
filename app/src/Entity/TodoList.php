@@ -22,8 +22,11 @@ class TodoList implements JsonSerializable
     #[ORM\Column(nullable: false)]
     private bool $isDeleted = false;
 
-    #[ORM\OneToMany(mappedBy: '$list', targetEntity: Task::class)]
+    #[ORM\OneToMany(mappedBy: 'list', targetEntity: Task::class)]
     private Collection $tasks;
+
+    #[ORM\ManyToOne(targetEntity: User::class,cascade:["persist"],  inversedBy: 'lists')]
+    private User $user;
 
     public function __construct()
     {
@@ -84,5 +87,17 @@ class TodoList implements JsonSerializable
             'id' => $this->id,
             'name' => $this->name
         ];
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): mixed
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }

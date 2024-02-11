@@ -7,7 +7,9 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -152,5 +154,22 @@ class UserServiceImpl extends AbstractController implements UserService
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function login(?User $user)
+    {
+        if ($user === null) {
+            return $this->json([
+                'message' => 'Invalid login request: check that the Content-Type header is "application/json"',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return [
+            'userId' => $user->getId(),
+            'apiToken' => $user->getValidTokenStrings()[0],
+        ];
     }
 }

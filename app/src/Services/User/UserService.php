@@ -84,4 +84,11 @@ interface UserService
      * @return void
      */
     public function deleteUser(int $id): void;
+
+    /**
+     * Loggt ein Benutzer ein.
+     * @param User|null $user Der Benutzer, der sich einloggen möchte
+     * @return mixed Objekt aus userId und ApiToken
+     */
+    public function login(?User $user);
 }

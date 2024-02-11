@@ -15,7 +15,7 @@ interface TaskService
      * @param Request $request Die Aufgabe die man erstellen möchte
      * @param ?User $user der Nutzer, der die Aufgabe erstellt hat
      */
-    public function createNewTask(Request $request, #[CurrentUser] ?User $user);
+    public function createNewTask(Request $request);
 
     /**
      * Erstellt eine Aufgabe, die einer Organisation gehört
@@ -36,6 +36,13 @@ interface TaskService
      * @return array Die Liste von Aufgaben.
      */
     public function getTasksByUserId(int $userId): array;
+
+    /**
+     * Markiert eine Aufgabe als erledigt
+     * @param int $id Die Id der Aufgabe
+     * @return void
+     */
+    public function markTaskAsDoneOrUndone(int $id): void;
 
     /**
      * Gibt Aufgaben zurück, die einer ausgewählten Organisation gehören.

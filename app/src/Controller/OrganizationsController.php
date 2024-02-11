@@ -41,7 +41,6 @@ class OrganizationsController extends AbstractController
                 AbstractNormalizer::ATTRIBUTES => [
                     'id',
                     'name',
-//                    'owner',
                     'createdAt',
                     'updatedAt',
                 ]

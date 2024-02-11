@@ -86,9 +86,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
     #[ORM\ManyToMany(targetEntity: Task::class, mappedBy: 'assignees')]
     private Collection $assignedTasks;
 
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: TodoList::class)]
+    private Collection $lists;
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
+        $this->lists = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->updatedAt = new \DateTime();
         $this->apiTokens = new ArrayCollection();
@@ -403,5 +408,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
         ];
+    }
+
+    public function getLists(): Collection
+    {
+        return $this->lists;
+    }
+
+    public function setLists(Collection $lists): mixed
+    {
+        $this->lists = $lists;
+
+        return $this;
     }
 }
