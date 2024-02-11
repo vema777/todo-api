@@ -8,7 +8,7 @@ Im Docker-Terminal führt man aus dem Ordner /var/www/symfony_docker folgendes a
 
 - ./bin/console doctrine:database:create (wenn notwendig)
 - ./bin/console doctrine:migrations:migrate
-- ./bin/console doctrine:fixtures:load (Anmerkung: die erstellten Daten sind nich 100% richtig)
+- ./bin/console doctrine:fixtures:load
 - ./bin/console doctrine:query:sql "SELECT * FROM user"
 
 Alle fake-User haben das Passwort "password"  
