@@ -12,7 +12,7 @@ Im Docker-Terminal führt man aus dem Ordner /var/www/symfony_docker folgendes a
 - ./bin/console doctrine:query:sql "SELECT * FROM user"
 
 Alle fake-User haben das Passwort "password"  
-Es wird auch ein fake-User mit der E-Mail "organization_owner" erstellt
+Es werden auch fake-User mit der E-Mail "owner@example.com" und "admin@example.com" erstellt
 
 Einen neuen User kann man mit Postman erstellen, indem man ein POST-Request auf:  
 localhost:8080/api/users/logup  
@@ -28,7 +28,7 @@ Man kann sich einloggen, indem man ein POST-Request auf
 localhost:8080/api/login  
 mit folgendem JSON-Inhalt schickt:  
 {
-"email": "test_email9",
+"email": "admin@example.com",
 "password": "password"
 }  
   
