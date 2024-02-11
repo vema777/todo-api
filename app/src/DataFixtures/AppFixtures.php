@@ -2,66 +2,68 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\ApiToken;
+use App\Entity\Organization;
+use App\Entity\User;
 use App\Factory\ApiTokenFactory;
-use App\Factory\OrganizationFactory;
 use App\Factory\UserFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->passwordHasher = $passwordHasher;
+    }
+
     public function load(ObjectManager $manager): void
     {
-        // erstellt immer einen Eigentümer-User
-        $ownerUser = UserFactory::createOne([
-            'email' => 'organization_owner',
-            'password' => 'password',
-            'is_deleted' => false,
-            'roles' => ['ROLE_ORGANIZATION_OWNER'],
-        ]);
-        ApiTokenFactory::createOne(['ownedBy' => $ownerUser]);
-        // erstellt immer einen Admin User
-        $adminUser = UserFactory::createOne([
-            'email' => 'admin',
-            'password' => 'password',
-            'is_deleted' => false,
-            'roles' => ['ROLE_ADMIN'],
-        ]);
-        ApiTokenFactory::createOne(['ownedBy' => $adminUser]);
-        // erstellt einen normalen User
-        $normalUser = UserFactory::createOne([
-            'email' => 'user',
-            'password' => 'password',
-            'is_deleted' => false,
-            'roles' => ['ROLE_USER'],
-        ]);
-        ApiTokenFactory::createOne(['ownedBy' => $normalUser]);
-
         ApiTokenFactory::createMany(10, function() {
             return [
                 'ownedBy' => UserFactory::new(),
             ];
         });
 
-        OrganizationFactory::createMany(3, function () {
-            return [
-                'owner' => UserFactory::createOne([
-                    'password' => 'password',
-                    'is_deleted' => false,
-                    'roles' => ['ROLE_ORGANIZATION_OWNER'],
-                ]),
-            ];
-        });
+        // erstellt einen Eigentümer-Nutzer
+        $ownerUser = new User();
+        $ownerUser->setEmail('owner@example.com');
+        $ownerUser->setPassword($this->passwordHasher->hashPassword($ownerUser, 'password'));
+        $ownerUser->setFirstName('John');
+        $ownerUser->setLastName('Smith');
+        $ownerUser->setRoles(['ROLE_ORGANIZATION_OWNER']);
+        $manager->persist($ownerUser);
 
-        OrganizationFactory::createMany(3, function () {
-            return [
-                'users' => UserFactory::new()->many(3, 6),
-                'owner' => UserFactory::createOne([
-                    'password' => 'password',
-                    'is_deleted' => false,
-                    'roles' => ['ROLE_ORGANIZATION_OWNER'],
-                ]),
-            ];
-        });
+        $apiTokenOwner = new ApiToken();
+        $apiTokenOwner->setOwnedBy($ownerUser);
+        $manager->persist($apiTokenOwner);
+
+        // erstellt einen Admin-Nutzer
+        $adminUser = new User();
+        $adminUser->setEmail('admin@example.com');
+        $adminUser->setPassword($this->passwordHasher->hashPassword($adminUser, 'password'));
+        $adminUser->setFirstName('Donald');
+        $adminUser->setLastName('Scrooge');
+        $adminUser->setRoles(['ROLE_ADMIN']);
+        $manager->persist($adminUser);
+
+        $apiTokenAdmin = new ApiToken();
+        $apiTokenAdmin->setOwnedBy($adminUser);
+        $manager->persist($apiTokenAdmin);
+
+        // erstellt eine Organisation
+        $organization = new Organization();
+        $organization->setName('Oxygen GmbH');
+
+        $organization->addUser($ownerUser);
+        $organization->setOwner($ownerUser);
+        $organization->addUser($adminUser);
+
+        $manager->persist($organization);
+
+        $manager->flush();
     }
 }
