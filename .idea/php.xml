@@ -143,6 +143,7 @@
       <path value="$PROJECT_DIR$/app/vendor/zenstruck/assert" />
       <path value="$PROJECT_DIR$/app/vendor/zenstruck/foundry" />
       <path value="$PROJECT_DIR$/app/vendor/symfony/serializer" />
+      <path value="$PROJECT_DIR$/app/vendor/nelmio/cors-bundle" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2">

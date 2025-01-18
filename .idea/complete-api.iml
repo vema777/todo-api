@@ -5,6 +5,8 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/app/src" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/app/tests" isTestSource="true" packagePrefix="App\Tests\" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/doctrine/cache" />
       <excludeFolder url="file://$MODULE_DIR$/complete_api/vendor/doctrine/collections" />
@@ -135,6 +137,7 @@
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/zenstruck/assert" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/zenstruck/callback" />
       <excludeFolder url="file://$MODULE_DIR$/app/vendor/zenstruck/foundry" />
+      <excludeFolder url="file://$MODULE_DIR$/app/vendor/nelmio/cors-bundle" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

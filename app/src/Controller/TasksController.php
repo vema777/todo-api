@@ -215,7 +215,6 @@ class TasksController extends AbstractController
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\Tag(name: 'tasks')]
-    #[IsGranted('ROLE_USER')]
     public function getTasksByUserId(int $id): JsonResponse
     {
         $tasks = $this->taskService->getTasksByUserId($id);
